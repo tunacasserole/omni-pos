@@ -1,0 +1,30 @@
+﻿    <!--
+       #tabs {
+           border-bottom: .53m solic #0033cc;
+           margin: 0;
+           padding: 0;
+       }
+       #tabs li {
+          display: inline;
+          border-top: .1em solid #03c;
+          border-left: .1em solid #03c;
+          border-right: .1em solid #03c;
+       }
+       #tabs li a {
+          text-decoration: none;
+          padding: .25em 1em;
+          color: #000;
+       }
+       #page1 #tabs li#tab1 a, #page2 #tabs li#tab2 a, #page3 #tabs li#tab3 a {
+           padding: .25em 1em;
+           background-color: #03c;
+           color: #fff;
+       }
+       -->
+body {
+        <ul id="tabs">
+        <li id="customerTab"><a href="Customer.aspx">Customer></a></li>
+        <li id="itemsTab"><a href="Order.aspx">Items></a></li>
+        <li id="paymentTab"><a href="Payment.aspx">Payment></a></li>
+    </ul>
+}
