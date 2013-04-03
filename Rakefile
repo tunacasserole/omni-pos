@@ -11,9 +11,9 @@ namespace :pos do
       task env do
         current_branch = `git branch | grep ^* | awk '{ print $2 }'`.strip
    
-        Rake::Task['deploy:before_deploy'].invoke(env, current_branch)
-        Rake::Task['deploy:update_code'].invoke(env, current_branch)
-        Rake::Task['deploy:after_deploy'].invoke(env, current_branch)
+        Rake::Task['pos:deploy:before_deploy'].invoke(env, current_branch)
+        Rake::Task['pos:deploy:update_code'].invoke(env, current_branch)
+        Rake::Task['pos:deploy:after_deploy'].invoke(env, current_branch)
       end
     end
    
@@ -36,10 +36,8 @@ namespace :pos do
     end
    
     task :update_code, :env, :branch do |t, args|
-      FileUtils.cd Rails.root do
         puts "Updating #{REMOTES[args[:env]]} with branch #{args[:branch]}"
         `git push #{REMOTES[args[:env]]} +#{args[:branch]}:master`
-      end
     end
   end
 end
