@@ -1,0 +1,508 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Till</title>
+    <!-- Javascript Imports -->
+    <script type="text/javascript" src="Scripts/jquery-1.8.1.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.23.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/POS.custom.js"></script>
+    <style type="text/css">
+     body {
+	    margin: 0; /* margin and padding only necessary to cater for Mac IE5 */
+	    padding: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+        background-color: rgba(247, 248, 167, 1.0) !important;
+ 	    /*\*/	overflow: hidden; /* because Mac IE5 doesn't understand */
+        -moz-border-radius:10px;
+        border-radius:10px;
+	}
+    div {
+        height: 1.6em;
+    }
+    label {
+        float:left;
+        clear:left;
+        padding-left: 2em;
+    }
+    input:focus {
+        outline:none;
+        border-color:#ff9933;
+        box-shadow:0 0 5px #ff9933 /*inset*/;
+    }
+    #leftColumn {
+        position: absolute;
+        left: 40px !important;
+        top: 40px  !important;
+        width: 380px;
+        height: 600px;
+        border: 3px solid white;
+        background-color:#cbdaf0;
+        color:black;
+        -moz-border-radius:10px;
+        border-radius:10px;
+    }
+    #rightColumn {
+        position: absolute;
+        left: 420px !important;
+        top: 40px  !important;
+        width: 380px;
+        height: 600px;
+        border: 3px solid white;
+        background-color:#cbdaf0;
+        color:black;
+        -moz-border-radius:10px;
+        border-radius:10px;
+    }
+    #msgBox {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            border: none;
+            width: 1020px;
+            height: 764px;
+            /*background: white transparent scroll repeat 0% 0%;*/
+            background: white;
+            opacity: 0.4;
+            filter:alpha(opacity=40);
+            pointer-events:visible;
+            z-index: 9997;
+        }
+        #_msgBox {
+            position: absolute;
+            top: 270px;
+            left: 310px;
+            width: 400px;
+            height: 200px;
+            background-color: rgba(255, 168, 64, 1.0) !important;
+            color: white !important;
+            border: 3px solid white !important;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            z-index: 9998;
+        }
+    .tender {
+        width: 100px;
+        text-align: right;
+        float:right;
+        clear:right;
+        margin-right: 2em;
+    }
+    .noncash {
+        width: 100px;
+        text-align: right;
+        float:right;
+        clear:right;
+        margin-right: 2em;
+    }
+    #waiting {
+        position: absolute;
+        top: 340px;
+        left: 500px;
+        border: none !important;
+        z-index: 9001;
+        display: none;
+    }
+    </style>
+    <script type="text/javascript">
+        modelUrl = "http://horizon-buildit.herokuapp.com/app/direct/";
+        var locationId = '1';
+
+        function init() {
+            $('body').bind("contextmenu", function (e) {
+                e.preventDefault();
+            });
+
+            // initial setup
+            $('#total').text(Total.formatMoney(2));
+            $('#lastBalance').text('Last Balance: ' + LastBalance.formatMoney(2));
+            $('#expectedFloat').text('Expected Float: ' + ExpectedFloat.formatMoney(2));
+            $('#expectedChecks').text('Expected Checks: ' + ExpectedChecks);
+            $('#expectedGiftCertificates').text('Expected Gift Certificates: ' + ExpectedGiftCertificates);
+            fillDiscrepancies();
+            getTills();
+            $('#0')[0].focus();
+        };
+        function getTillsx() {
+            for (var i = 41; i < 46; i++) {
+                $('#tillsComboBox').append(
+                    $('<option/>', {
+                        value: i,
+                        text: i
+                    })
+                );
+            }
+        }
+
+        function getTills() {
+            var invocation = new XMLHttpRequest();
+            if (invocation) {
+                $('#waiting').show();
+                var disp = '';
+                var nbr = '';
+                var request = '{"action":"Tills","method":"read",' //"data":[{"with":[{"location_id":{"equal_to":"'+ locationId +'"}}]}],'
+                //request += '"page":1,"start":0,"limit":10,"type":"rpc","tid":1}'; //sort":[{"property":"last_name","direction":"ASC"}],
+                request += '"type":"rpc","tid":1}'; //sort":[{"property":"last_name","direction":"ASC"}],
+                invocation.open('POST', modelUrl, true);
+                invocation.setRequestHeader("X-API-TOKEN", token);
+                invocation.setRequestHeader("Content-Type", "application/json");
+                invocation.send(request);
+                invocation.onreadystatechange = function () {
+                    if (invocation.readyState == 4) {
+                        if (invocation.status == 200) {
+                            var json = $.parseJSON(invocation.responseText)
+                            $.each(json.result.records, function (i, item) {
+                                $.each(i,function (k,v) {
+                                    if (k == 'till_nbr') { nbr = v }
+                                    if (k == 'display') { disp = v }
+                                    $('#tillsComboBox').append(
+                                        $('<option/>', {
+                                            value: nbr,
+                                            text: disp
+                                        })
+                                    );
+                                })
+                            })
+                        } else if (invocation.status == 500) {
+                            showMsg('Internal Server Error.');
+                        } else if (invocation.status == 503) {
+                            showMsg('Sevice Unavailable.');
+                        } else {
+                            showMsg('Invocation Errors Occured; Status: ' + invocation.statu);
+                        }
+                        $('#waiting').hide();
+                    }
+                };
+            } else {
+                showMsg('No Invocation TookPlace At All.');
+                $('#waiting').hide();
+            }
+        };
+    </script>
+</head>
+<body onload="init()" style="background-color:#cbdaf0">
+    <form id="form1" runat="server">
+        <div style="margin: 0; padding 0; border:none;">
+            <img id='exitGetData' onclick="javascript: history.go(-1)" src="Images/round-exit.png" alt="Exit" style="position:absolute; left:960px; top:0px; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+
+        <div id="leftColumn";>
+            <div id ="float" style="text-align:center; font-family:Arial; font-size:1.2em; font-weight: bold; padding-top:.5em;">Float Counts</div>
+            <div style="margin: 6px 0 10px 6px !important;">
+                <label for="tillsComboBox">Tills:</label>
+                <select name="tills" id="tillsComboBox" style='text-align:left; width:280px;margin: 0 10px 0 6px; float:right; clear:right;'>
+                </select>
+            </div>
+            
+           
+            <div id="paycolumns" style="font-family:Arial;">
+                <div>
+                    <span id="tendertype" style="font-weight:bold; padding-left:1em;">Tender Type</span>
+                    <span id="inputs" style="font-weight:bold; float:right; padding-right:3em;">Amount</span>
+                </div>
+            </div>
+            <div class="tendertypes">
+                <div id="o0"><label id="l0">$100:</label><input type="text" id="0" class="tender"  /></div>
+                <div id="o1"><label id="l1">$50:</label><input type="text" id="1" class="tender" /></div>
+                <div id="o2"><label id="l2">$20:</label><input type="text" id="2" class="tender" /></div>
+                <div id="o3"><label id="l3">$10:</label><input type="text" id="3" class="tender" /></div>
+                <div id="o4"><label id="l4">$5:</label><input type="text" id="4" class="tender" /></div>
+                <div id="o5"><label id="l5">$2:</label><input type="text" id="5" class="tender"  /></div>
+                <div id="o6"><label id="l6">$1:</label><input type="text" id="6" class="tender"  /></div>
+                <div id="o7"><label id="l7">Halves:</label><input type="text" id="7" class="tender" /></div>
+                <div id="o8"><label id="l8">Quarters:</label><input type="text" id="8" class="tender" /></div>
+                <div id="o9"><label id="l9">Dimes:</label><input type="text" id="9" class="tender" /></div>
+                <div id="o10"><label id="l10">Nickels:</label><input type="text" id="10" class="tender" /></div>
+                <div id="o11"><label id="l11">Pennies:</label><input type="text" id="11" class="tender" /></div>
+                <div id="oChecks"><label id="lChecks">Checks:</label><input type="text" id="iChecks" class="noncash" /></div>
+                <div id="oGiftCertificates"><label id="lGiftCertificates">Gift Certificates:</label><input type="text" id="iGiftCertificates" class="noncash" /></div>
+            </div>
+            <div style="clear:both; border:none;"></div>
+            <div style="margin-top: 1em;">
+                <label id="total"></label>
+                <button type="button" id="clearTender" style="margin-left:5em;">Clear Entries</button>
+                <button type="button" style="margin-right: 2em; float:right; clear:right;" id="finished">Finished</button>
+            </div>
+        </div>
+
+        <div id="rightColumn">
+            <div id ="lastBalance" style="text-align:center; font-family:Arial; font-size:1.2em; font-weight: bold; padding-top:.5em; height: 1.2em !important;"></div>
+            <div id ="expectedFloat" style="text-align:center; font-family:Arial; font-size:1.2em; font-weight: bold; padding-top:.5em; height: 1.2em !important;"></div>
+            <div id ="expectedChecks" style="text-align:center; font-family:Arial; font-size:1.2em; font-weight: bold; padding-top:.5em; height: 1.2em !important;"></div>
+            <div id ="expectedGiftCertificates" style="text-align:center; font-family:Arial; font-size:1.2em; font-weight: bold; padding-top:.5em; height: 1.2em !important;"></div>
+            <hr />
+            <div id ="discrepancy" style="text-align:center; font-family:Arial; font-size:1.2em; font-weight: bold; padding-top:.5em; height: 1.2em !important;"></div>
+            <div id ="disc2" style="text-align:center; font-family:Arial; font-size:1.2em; font-weight: bold; padding-top:.5em; height: 1.2em !important; display:none;"></div>
+            <div style="margin: 1em 0 0 2em;"><button type="button" id="confirmDiscrepancy">Confirm Discrepancy</button></div>
+            <hr />
+            <div id="oLoans" style="margin: 2em 0 0 0; height: 1.2em !important;"><label id="lLoans">Loan Amount:</label><input type="text" id="iLoans" class="tender"  /></div>
+            <div style="margin: 0 0 0 2em;"><button type="button" id="loanButton">Accept Loan</button></div>
+
+            <div id="oPickups" style="margin: 2em 0 0 0; height: 1.2em !important;"><label id="lPickups">Pickup Amount:</label><input type="text" id="iPickups" class="tender"  /></div>
+            <div style="margin: 0 0 2em 2em;"><button type="button" id="pickupButton">Accept Pickup</button></div>
+            <hr />
+            <div id ="currentTerminal" style="text-align:center; font-size: .8em; font-family:Arial; font-weight: bold; padding-top:.5em; height: 1.2em !important;">Currently Assigned Terminal</div>
+            <div style="margin: 6px 0 10px 6px !important;">
+                <label for="terminalsComboBox" style="padding-left: 4px !important;">Terminal:</label>
+                <select name="terminals" id="terminalsComboBox" style='text-align:left; width:280px;margin: 0 10px 0 6px; float:right; clear:right;'>
+                    <option value="none">None</option>
+                </select>
+            </div>
+            <div style="margin: 0 0 0 2em;"><button type="button" id="btnMove">Assign to Selected Terminal</button></div>
+        </div>
+    </form>
+
+    <!-- Message Box (replaces alert) -->
+    <div id="msgBox" style="display:none;"></div>
+    <div id="_msgBox" style="display:none;">
+        <div style="text-align:center; margin-top:1em; border:none !important;">
+            <span id="msgText" style="font-size:1.5em; font-weight:bold;">Message!</span>
+        </div>
+        <div id="btnCenter" style="text-align:center; border:none !important;">
+            <button type="button" id="btnMsgOK" style="position: absolute; top: 150px; left: 170px; width: 60px; font-size:1.5em;">OK</button>
+        </div>
+    </div>
+
+    <div id="waiting" style="display:none;">
+        <img id="loading" alt="Loading" src="Images/loading.gif" style=" width:60px; height:60px;" />
+    </div>
+
+    <script type="text/javascript">
+        // examine keyboard keys when not in an editor
+        var blockedKeysArr = [
+            // allow tab (7), caps lock (20), page up (33), page down (34), end (35)
+            8,  // backspace - will go back a url
+            //13, // enter
+            18, // alt
+            19, // pause, break
+            27, // escape
+            36, // home
+            45, // insert
+            // function keys 1 (112) - 12 (123)
+            112, 113, 114, 115,
+            116, // F5
+            117, 118, 119, 120, 121,
+            122, // F11
+            123];
+
+        var Total = 0.0
+        var InitialAmount = Total;
+        var LastBalance = 300.00;
+        var ExpectedFloat = 1204.32;
+        var ExpectedChecks = 2;
+        var ExpectedGiftCertificates = 3;
+
+        $('input').bind('change', (function () {
+            Total = 0.0;
+            $('.tender').each(function () {
+                if ($(this).val() != undefined) {
+                    switch (parseInt($(this)[0].id)) {
+                        case 0:
+                            Total += $(this).val() * 100;
+                            break;
+                        case 1:
+                            Total += $(this).val() * 50;
+                            break;
+                        case 2:
+                            Total += $(this).val() * 20;
+                            break;
+                        case 3:
+                            Total += $(this).val() * 10;
+                            break;
+                        case 4:
+                            Total += $(this).val() * 5;
+                            break;
+                        case 5:
+                            Total += $(this).val() * 2;
+                            break;
+                        case 6:
+                            Total += $(this).val() * 1;
+                            break;
+                        case 7:
+                            Total += $(this).val() * .5;
+                            break;
+                        case 8:
+                            Total += $(this).val() * .25;
+                            break;
+                        case 9:
+                            Total += $(this).val() * .1;
+                            break;
+                        case 10:
+                            Total += $(this).val() * .05;
+                            break;
+                        case 11:
+                            Total += $(this).val() * .01;
+                    }
+                }
+            })
+
+            $('#total').text(Total.formatMoney(2));
+            fillDiscrepancies();
+        })
+        );
+        $('#tillsComboBox').change(function () {
+            clearEntries();
+        });
+
+        function fillDiscrepancies() {
+            var adder = '';
+            var a1 = '';
+            var a2 = '';
+            var xChecks = ExpectedChecks - $('#iChecks').val();
+            var xCerts = ExpectedGiftCertificates - $('#iGiftCertificates').val();
+
+            if (xChecks == 1) { a1 = xChecks + ' Check' };
+            if (xChecks > 1) { a1 = xChecks + ' Checks' };
+            //$('#expectedChecks').text('Expected Checks: ' + xChecks);
+
+            if (xCerts == 1) { a2 = xCerts + ' Gift Certificate' };
+            if (xCerts > 1) { a2 = xCerts + ' Gift Certificates' };
+            //$('#expectedGiftCertificates').text('Expected Gift Certificates: ' + xCerts);
+
+            if (a1 != '' && a2 != '') {
+                adder = a1 + ', ' + a2;
+            } else {
+                adder = a1 + a2;
+            }
+
+            var disc = Math.round((ExpectedFloat - Total) * 100) / 100;
+            var msgc = '';
+            if (disc > 0) {
+                msgc = ' Short';
+            } else if (disc < 0) {
+                msgc = ' Over';
+            }
+            $('#discrepancy').text('Discrepancy: ' + (ExpectedFloat - Total).formatMoney(2) + msgc);
+            if (disc == 0 && adder == '') {
+                $('#confirmDiscrepancy').hide(2);
+            } else {
+                $('#confirmDiscrepancy').show(2);
+            }
+
+            $('#disc2').text(adder);
+            if (adder == '') {
+                $('#disc2').hide(2);
+            } else {
+                $('#disc2').show(2);
+            }
+        }
+
+        $('#clearTender').click(function () {
+            clearEntries();
+        });
+
+        function clearEntries() {
+            for (var i = 0; i < 12; i++) {
+                $('#' + i).val('');
+            }
+            Total = 0;
+            $('#total').text(Total.formatMoney(2));
+            fillDiscrepancies();
+            $('#0')[0].focus();
+        };
+
+        $('#finished').click(function () {
+
+            history.go(-1);
+        });
+
+        // Keyboard
+        $('body').keydown(function (e) {
+            if (e.ctrlKey || e.altKey) { return false; };
+            if (e.target.type != "text") { return false; };
+
+            //adjust for keypad
+            if (e.which >= 96 && e.which <= 105) {
+                e.which -= 48;
+            }
+            //ignore TAB
+            if (e.which == 9 || e.which == 16) {
+                return true;
+            }
+
+            //adjust for CR or arrow down or page down
+            if (e.which == 13 || e.which == 40 || e.which == 34) {
+                var x = document.getElementsByTagName("input");
+                for (var i = 0; i < x.length; i++) {
+                    if (e.target.id == x[i].id && i < x.length - 1) {
+                        if (/^\d*$/.test(x[i + 1].id) == true || x[i + 1].className == 'noncash') {
+                            if (x[i + 1].type == "text") {
+                                $('#' + x[i + 1].id).focus();
+                                break;
+                            }
+                        }
+                    }
+                    if (e.target.id == x[i].id && /^\d*$/.test(x[i + 1].id) == false) {
+                        $('#0').focus();
+                        break;
+                    }
+                }
+                return false;
+            }
+
+            //adjust for arrow up or page up
+            if (e.which == 33 || e.which == 38) {
+                var x = document.getElementsByTagName("input");
+                for (var i = 0; i < x.length; i++) {
+                    if (e.target.id == x[i].id && i < x.length) {
+                        if (i >= 1 && x[i - 1].type == "text") {
+                            $('#' + x[i - 1].id).focus();
+                            break;
+                        } else { break; }
+                    }
+                }
+                return false;
+            }
+
+            //test for delete key
+            if (e.which == 46) {
+                // pass the delete through
+                return true;
+            }
+            else if (e.target.type == 'text' && (e.which == 8 || e.which == 35|| e.which == 36 || e.which == 37 || e.which == 39)) {
+                // pass backspace, end, home, left and right arrows to form if text type input
+                return true;
+            }
+            else if (e.target.type == 'text' && e.which == 27) {
+                // clear entry if text type input
+                e.target.value = '';
+                return false;
+            }
+            else {
+                // review other codes to see if they should be blocked
+                for (var t = 0; t < blockedKeysArr.length; t++) {
+                    if (e.which == blockedKeysArr[t]) {
+                        //alert("Key Code: " + window.event.keyCode + " This action is not allowed");
+                        if (e.which != 16 && e.which != 17) {
+                            window.event.keyCode = 503;
+                        }; //shift, control
+                        if (e.stopPropagation) e.stopPropagation();
+                        if (e.preventDefault) e.preventDefault();
+                        return false;
+                    }
+                }
+                if (/^\d*$/.test(e.target.id) == true) {
+                    if (e.which < 48 || e.which > 57) { return false };
+                }
+                return true;
+            }
+        });
+
+        // show and hide the message box
+        function showMsg(msg) {
+            $('#msgText').text(msg);
+            $('#msgBox').show();
+            $('#_msgBox').show();
+        };
+        $('#btnMsgOK').click(function () {
+            $('#_msgBox').hide();
+            $('#msgBox').hide();
+        });
+    </script>
+</body>
+</html>

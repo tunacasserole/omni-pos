@@ -1,0 +1,1278 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+        <title>Customer</title>
+
+    <!-- Styles Used/Referenced -->
+    <link rel="stylesheet" href="Styles/jquery-ui-1.8.16.custom.css" type="text/css" />
+    <link rel="stylesheet" href="Styles/examples.css" type="text/css" />
+    <link rel="stylesheet" href="Styles/Slick.Grid.css" type="text/css" />
+    <link rel="stylesheet" href="Styles/POS.css" type="text/css" />
+
+    <script type="text/javascript" src="Scripts/jquery-1.8.1.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.23.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery.event.drag-2.0.min.js"></script>
+    <script type="text/javascript" src="Scripts/POS.custom.js"></script>
+    <script type="text/javascript" src="Scripts/Slick.Core.js"></script>
+    <script type="text/javascript" src="Scripts/Slick.Grid.js"></script>
+    <script type="text/javascript" src="Scripts/Slick.Formatters.js"></script>
+    <script type="text/javascript" src="Scripts/Slick.Editors.js"></script>
+    <script type="text/javascript" src="Scripts/Slick.RowSelectionModel.js"></script>
+    <script type="text/javascript" src="Scripts/textinputs_jquery.js"></script>
+
+    <style type="text/css">
+        #custid {
+            position: absolute;
+            top: 42px;
+            left: 60px;
+            height: 709px;
+            overflow: auto;
+            width: 260px;
+            background-color: #f5f5f5;
+            border-collapse: collapse;
+            margin: 40px 0 0 10px; /* for Mac IE5 */
+            /*\*/ margin: 0; /* Put back for all the rest */
+            /*\*/ overflow: auto; /* no need for Mac IE5 to see this */
+        }
+        #buttons {
+            position: absolute;
+            top: 42px;
+            left: 320px;
+            height: 709px;
+            overflow: auto;
+            width: 660px;
+            background-color: #f5f5f5;
+            border-collapse: collapse;
+            margin: 40px 0 0 10px; /* for Mac IE5 */
+            /*\*/ margin: 0; /* Put back for all the rest */
+            /*\*/ overflow: auto; /* no need for Mac IE5 to see this */
+        }
+        #btnPos {
+            position: absolute;
+            top: 650px;
+            left: 0px;
+            height: 50px;
+            width:660px;
+            border:none;
+            border-collapse: collapse;
+        }
+        .ui-widget-content {
+            background-color: #f5f5f5 !important;
+        }
+        #CustomerNotes {
+            position: absolute;
+            left: 315px !important;
+            top: 180px  !important;
+            width: 23em;
+            height: 19em;
+            border: 3px solid rgba(0, 0, 0, 1.0);
+            background-color: rgba(245, 209, 181, 0.90);
+            color:black;
+        }
+        #msgBox {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            border: none;
+            width: 1020px;
+            height: 764px;
+            /*background: white transparent scroll repeat 0% 0%;*/
+            background: white;
+            opacity: 0.4;
+            filter:alpha(opacity=40);
+            pointer-events:visible;
+            z-index: 9997;
+        }
+        #_msgBox {
+            position: absolute;
+            top: 270px;
+            left: 310px;
+            width: 400px;
+            height: 200px;
+            background-color: rgba(255, 168, 64, 1.0) !important;
+            color: white !important;
+            border: 3px solid white !important;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            z-index: 9998;
+        }
+    </style>
+
+    <script type="text/javascript">
+        var CustomerNotes = '';
+        var CurrentSchool = '';
+        var CurrentSchoolId = ''
+        var CustomerSchool = '';
+        var CustomerSchoolId = '';
+        isAddressFromPhoneNumber = false;
+        isShipFromPhoneNumber = false;
+
+        // clear out customer info
+        function clearCustomer() {
+            $('#residential').prop("checked", true);
+            $('#business').prop("checked", false);
+            $('#phone').val("");
+            $('#altphone').val("");
+            $('#lastName').val("");
+            $('#firstName').val("");
+            $('#address1').val("");
+            $('#address2').val("");
+            $('#city').val("");
+            $('#state').val("");
+            $('#zipCode').val("");
+            $('#country').val("US");
+            $('#email').val("");
+            $('#cschool').val("");
+            $('#sresidential').prop("checked", true);
+            $('#sbusiness').prop("checked", false);
+            $('#sphone').val("");
+            $('#saltphone').val("");
+            $('#slastName').val("");
+            $('#sfirstName').val("");
+            $('#saddress1').val("");
+            $('#saddress2').val("");
+            $('#scity').val("");
+            $('#sstate').val("");
+            $('#szipCode').val("");
+            $('#scountry').val("");
+            $('#semail').val("");
+            $('#customerNotes').val("");
+            $('#international').prop("checked", false);
+            $('#shipinternational').prop("checked", false);
+            CurrentSchool = '';
+            CurrentSchoolId = '';
+            CustomerSchool = '';
+            CustomerSchoolId = '';
+            $('#phone').focus();
+        };
+    </script>
+</head>
+<body onload="clearCustomer()">
+    <form id="form1" action="javascript:void(0);" style="border:none !important;">
+    <div style="margin: 0; padding 0; border:none;">
+        <img id='exitGetData' onclick="javascript: history.go(-1)" src="Images/round-exit.png" alt="Exit" style="position:absolute; left:960px; top:0px; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+    </div>
+    <div id="custid" style="overflow:hidden;">
+        <div id="sidebar-header" style="border: none; margin-top: .05em; height: 5em;">
+            <div style="border-top: none;  border-left:none;">
+                <p class="descrip" style="text-align:center">Customer</p>
+            </div>
+            <div style="border:none; margin-top: 3px;">
+                <button id="btnHistory" type="button" class="cbuttons" style="background-color:blue; color:white; margin-left:2.5em;">History</button>
+                <button id="btnCustomerNotes" type="button" class="cbuttons" style="background-color:aqua; color:black;">Notes</button>
+                <button id="btnClearCustomer" type="button" class="cbuttons" style="background-color:violet; color:white;">Clear</button>
+            </div>
+        </div>
+        <div style="height:2em; border-left:none;">
+            <span id="DivA" class="descrip" style="display: inline-block; padding-top:0.3em;">&nbsp;Address:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;International</span>
+            <input style="float:right; clear:right; margin-right:1em;" type="checkbox" id="international" />
+        </div>
+        <div style="border:none;">
+            <span style="width:50%; float:left; clear:left;">
+                <label for="residential"; style="padding-top: .3em !important;">Residential:&nbsp;</label>
+                <input type="radio" name="group1" id="residential" />
+            </span>
+            <span style="width:50%; float:right;clear:right;">
+                <label for="business"; style="padding-top: .3em !important;">Business:&nbsp;</label>
+                <input type="radio" name="group1" id="business" />
+            </span>
+        </div>
+        <div id="addressEntries" style="margin-top: 1em; border: none;">
+            <div class="ui-widget-content">
+                <label id="phonelabel" for="phone">Phone:</label>
+                <input type="text" id="phone" class="cust_input"  />
+            </div>
+            <div class="ui-widget-content">
+                <label id="altphonelabel" for="altphone">Alt Phone:</label>
+                <input type="text" id="altphone" class="cust_input" />
+            </div>
+            <div class="ui-widget-content">
+                <label id="lastnamelabel" for="lastName">Last Name:</label>
+                <input type="text" id="lastName" class="cust_input" />
+            </div>
+            <div class="customer">
+                <label id="firstnamelabel" for="firstName">First Name:</label>
+                <input type="text" class="cust_input" id="firstName" />
+            </div>
+            <div class="customer">
+                <label id="address1label" for="address1">Address:</label>
+                <input type="text" class="cust_input"" id="address1" />
+            </div>
+            <div class="customer">
+                <label id="address2label" for="address2"></label>
+                <input type="text" class="cust_input" id="address2" />
+            </div>
+            <div class="customer">
+                <label id="zipcodelabel" for="zipCode">ZIP Code:</label>
+                <input type="text" class="cust_input" id="zipCode" />
+            </div>
+            <div class="ui-widget-content">
+                <label id="citylabel" for="city">City:</label>
+                <input type="text" id="city" class="cust_input" />
+            </div>
+            <div class="customer">
+                <label id="statelabel" for="state">State:</label>
+                <input type="text" class="cust_input" id="state" />
+            </div>
+            <div class="customer">
+                <label id="countrylabel" for="country">Country:</label>
+                <input type="text" class="cust_input" id="country" />
+            </div>
+            <div class="ui-widget-content">
+                <label id="emaillabel" for="email">EMail:</label>
+                <input type="text" id="email" class="cust_input" />
+            </div>
+            <div class="ui-widget-content">
+                <label id="cschoollabel" for="cschool">School:</label>
+                <input type="text" id="cschool" class="cust_input" />
+            </div>
+            <div style="clear:both; border: none;"></div>
+        </div>
+
+        <div style="height:2em; margin-top: 1em; border-left:none;">
+            <span id="DivS" class="descrip" style="display: inline-block; padding-top:0.3em;">&nbsp;Shipping:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;International</span>
+            <input style="float:right; clear:right; margin-right:1em;"  type="checkbox" id="shipinternational" />
+        </div>
+        <div style="border:none;">
+            <span style="width:50%; float:left; clear:left;">
+                <label for="sresidential"; style="padding-top: .3em !important;">Residential:&nbsp;</label>
+                <input type="radio" name="group2" id="sresidential" />
+            </span>
+            <span style="width:50%; float:right;clear:right;">
+                <label for="sbusiness"; style="padding-top: .3em !important;">Business:&nbsp;</label>
+                <input type="radio" name="group2" id="sbusiness" />
+            </span>
+        </div>
+        <div id="shipEntries"  style="margin-top: 4px; border: none;">
+            <div class="ui-widget-content">
+                <label  id="sphonelabel" for="sphone">Phone:</label>
+                <input type="text" id="sphone" class="cust_input" />
+            </div>
+            <div class="ui-widget-content">
+                <label  id="saltphonelabel" for="saltphone">Alt Phone:</label>
+                <input type="text" id="saltphone" class="cust_input" />
+            </div>
+            <div class="ui-widget-content">
+                <label id="slastnamelabel" for="slastName">Last Name:</label>
+                <input type="text" id="slastName" class="cust_input" />
+            </div>
+            <div class="customer">
+                <label id="sfirstnamelabel" for="sfirstName">First Name:</label>
+                <input type="text" class="cust_input" id="sfirstName" />
+            </div>
+            <div class="customer">
+                <label id="saddress1label" for="saddress1">Address:</label>
+                <input type="text" class="cust_input" id="saddress1" />
+            </div>
+            <div class="customer">
+                <label id="saddress2label" for="saddress2"></label>
+                <input type="text" class="cust_input" id="saddress2" />
+            </div>
+            <div class="customer">
+                <label id="szipcodelabel" for="szipCode">ZIP Code:</label>
+                <input type="text" class="cust_input" id="szipCode" />
+            </div>
+            <div class="ui-widget-content">
+                <label id="scitylabel" for="scity">City:</label>
+                <input type="text" id="scity" class="cust_input" />
+            </div>
+            <div class="customer">
+                <label id="sstatelabel" for="sstate">State:</label>
+                <input type="text" class="cust_input" id="sstate" />
+            </div>
+            <div class="customer">
+                <label id="scountrylabel" for="scountry">Country:</label>
+                <input type="text" class="cust_input" id="scountry" />
+            </div>
+            <div class="ui-widget-content">
+                <label id="semaillabel" for="semail">EMail:</label>
+                <input type="text" id="semail" class="cust_input" />
+            </div>
+            <div style="clear:both; border: none;"></div>
+        </div>
+        <div><button id="testAvalara" type="button" style="margin-left:2em; width:2em; height:2em;">T</button></div>
+    </div>
+    <div id="buttons">
+        <div id="taxInfoDiv" style="margin: 1.2em 0 0 1em; border:none;">
+            <div style="display:inline-block; vertical-align:middle; padding: 3px 3px 3px 3px;">
+                <label for="taxExempt"; style="padding-top: .3em !important;">Tax Exempt:&nbsp;</label>
+                <input type="checkbox" id="isTaxExempt" />
+            </div>
+            <div style="display:inline-block; vertical-align:middle; padding: 3px 3px 3px 3px;">
+                <label for="taxExempSt" style="padding-top: .3em !important;">Tax Exemption State:&nbsp;</label>
+                <input type="text" style="width:4em" id="taxExemptSt" />
+            </div>
+            <div style="display:inline-block; vertical-align:middle; padding: 3px 3px 3px 3px;">
+                <label for="taxExempNbr" style="padding-top: .3em !important;">Tax Exemption Number:&nbsp;</label>
+                <input type="text" id="taxExemptNbr" />
+            </div>
+        </div>
+        <div id="isStaffDiv" style="margin: 1.2em 0 0 1em; border:none;">
+            <div style="display:inline-block; vertical-align:middle; padding: 3px 3px 3px 3px;">
+                <label for="isStaff"; style="padding-top: .3em !important;">Is Staff:&nbsp;</label>
+                <input type="checkbox" id="isStaff" />
+            </div>
+            <div style="display:inline-block; vertical-align:middle; padding: 3px 3px 3px 3px;">
+                <label for="jobTitle" style="padding-top: .3em !important;">Role/Job Title:&nbsp;</label>
+                <input type="text" id="jobTitle" />
+            </div>
+        </div>
+        <div id="specialDiscount" style="margin: 1.2em 0 0 1em; border:none;">
+            <div style="display:inline-block; vertical-align:middle; padding: 3px 3px 3px 3px;">
+                <label for="isStaff"; style="padding-top: .3em !important;">Gets Special Discount:&nbsp;</label>
+                <input type="checkbox" id="isDiscount" />
+            </div>
+            <div style="display:inline-block; vertical-align:middle; padding: 3px 3px 3px 3px;">
+                <label for="jobTitle" style="padding-top: .3em !important;">Discount Percentage:&nbsp;</label>
+                <input type="text" style="width:4em" id="discount" />
+            </div>
+        </div>
+        <div id="btnPos" style="display:inline-block">
+            <button id="btnSave" type="button" class="buttons" style="margin-left:2em;">Save</button>
+            <button id="btnCancel" type="button" class="buttons" onclick="javascript: history.go(-1)" style="margin-right:2em; float:right; clear:right; background-color:tomato;">Cancel</button>
+        </div>
+    </div>
+    </form>
+
+        <!-- Message Box (replaces alert) -->
+    <div id="msgBox" style="display:none;"></div>
+    <div id="_msgBox" style="display:none;">
+        <div style="text-align:center; margin-top:1em; border:none !important;">
+            <span id="msgText" style="font-size:1.5em; font-weight:bold;">Message!</span>
+        </div>
+        <div id="btnCenter" style="text-align:center; border:none !important;">
+            <button type="button" id="btnMsgOK" style="position: absolute; top: 150px; left: 170px; width: 60px; font-size:1.5em;">OK</button>
+        </div>
+    </div>
+
+        <!-- Customer Notes -->
+    <div id="CustomerNotes" style="display:none;">
+        <div style="border:none;">
+            <img id='exitCustomerNotes' src="Images/round-exit.png" alt="Exit" style="float:right; clear:right; height:1.5em; width:1.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div style="border:none; margin-top:1em; text-align:center; font-family:Arial; font-size:1.2em; font-weight: bold;">Customer Notes</div>
+        <div style="border:none; margin-top:1em; margin-left: 2em;">
+            <textarea id="notesArea" rows="10" cols="40" style="font:Arial,,Normal,16" name="notesArea"></textarea>
+        </div>
+        <div style="border:none; margin-top:1em; margin-left: 2em;">
+            <button type="button" id="updateCustomerNotes">Update</button>
+        </div>
+    </div>
+
+        <!-- Customer Select Grid -->
+    <div id="getCustomer" style="display:none;">
+        <div style="border:none;">
+            <img id='exitGetCustomer' src="Images/round-exit.png" alt="Exit" style="float:right; clear:right; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div id="getCustomerMessage" style="text-align:center; margin:1em 0 1em 0; font-family:Arial; font-size: 18px; font-weight: bold; border:none !important; color:black">
+            Message!
+        </div>
+        <div id="getCustomerGrid"></div>
+        <div style="border:none; margin-top:3em;">
+            <button type="button" class="fbuttons" id="getCustomerSelect" style="background-color:#1d98ec; color:white; position:absolute; top:680px; left:5em;" >Select</button>
+            <button type="button" class="fbuttons" id="getCustomerNone" style="background-color:tomato; color:white; position:absolute; top:680px; left:866px;">None</button>
+        </div>
+
+    </div>
+
+    <!-- Customer History Grid -->
+    <div id="getHistory" style="display:none;">
+        <div style="border:none;">
+            <img id='exitHistory' src="Images/round-exit.png" alt="Exit" style="float:right; clear:right; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div id="getHistoryMessage" style="text-align:center; margin:1em 0 1em 0; font-family:Arial; font-size: 18px; font-weight: bold; border:none !important; color:black">
+            Message!
+        </div>
+        <div id="getHistoryGrid"></div>
+        <div style="border:none; margin-top:3em;">
+            <button type="button" class="fbuttons" id="doneHistory" style="position:absolute; top:680px; left:5em; background-color:#1d98ec; color:white;" >Done</button>
+        </div>
+
+    </div>
+
+    <!-- Constants, Variables -->
+    <script type="text/javascript">
+        // examine keyboard keys when not in an editor
+        var blockedKeysArr = [
+            // allow tab (7), caps lock (20), page up (33), page down (34), end (35)
+            8,  // backspace - will go back a url
+            //13, // enter
+            18, // alt
+            19, // pause, break
+            27, // escape
+            36, // home
+            45, // insert
+            // function keys 1 (112) - 12 (123)
+            112, 113, 114, 115,
+            116, // F5
+            117, 118, 119, 120, 121,
+            122, // F11
+            123];
+
+        var addrs1Parsed = false;
+        var addrs2Parsed = false;
+        var saddrs1Parsed = false;
+        var saddrs2Parsed = false;
+
+        var isAddressFromPhoneNumber = false;
+
+        // customer change
+        var is_downloaded_customer = false;
+        var c_international = false;
+        var c_residential = true;
+        var c_phone = '';
+        var c_altphone = '';
+        var c_lastName = '';
+        var c_firstName = '';
+        var c_address1 = '';
+        var c_address2 = '';
+        var c_city = '';
+        var c_state = '';
+        var c_zipCode = '';
+        var c_country = '';
+        var c_email = '';
+        var c_cschool = '';
+        var c_cschoolid = '';
+        var c_customerNotes = '';
+
+        var is_downloaded_shipto = false;
+        var c_shipinternational = false;
+        var c_sresidential = true;
+        var c_sphone = '';
+        var c_saltphone = '';
+        var c_slastName = '';
+        var c_sfirstName = '';
+        var c_saddress1 = '';
+        var c_saddress2 = '';
+        var c_scity = '';
+        var c_sstate = '';
+        var c_szipCode = '';
+        var c_scountry = '';
+        var c_semail = '';
+
+        var shortDays = [];
+        shortDays[0] = 'Sun';
+        shortDays[1] = 'Mon';
+        shortDays[2] = 'Tue';
+        shortDays[3] = 'Wed';
+        shortDays[4] = 'Thu';
+        shortDays[5] = 'Fri';
+        shortDays[6] = 'Sat';
+
+        var shortMonths = [];
+        shortMonths[0] = 'Jan';
+        shortMonths[1] = 'Feb';
+        shortMonths[2] = 'Mar';
+        shortMonths[3] = 'Apr';
+        shortMonths[4] = 'May';
+        shortMonths[5] = 'Jun';
+        shortMonths[6] = 'Jul';
+        shortMonths[7] = 'Aug';
+        shortMonths[8] = 'Sep';
+        shortMonths[9] = 'Oct';
+        shortMonths[10] = 'Nov';
+        shortMonths[11] = 'Dec';
+
+        var gridCust;
+        var dataCust = [];
+
+        var gridHistory;
+        var dataHistory = [];
+
+        modelUrl = "http://horizon-buildit.herokuapp.com/app/direct/";
+
+        var columnsCustomer = [
+        { id: "custLastName", name: "Last Name", field: "custLastName", width: 200, resizable: false },
+        { id: "custFirstName", name: "First Name", field: "custFirstName", width: 140, resizable: false },
+        { id: "custAddress", name: "Address", field: "custAddress", width: 300, resizable: false },
+        { id: "custCity", name: "City", field: "custCity", width: 200, resizable: false },
+        { id: "custState", name: "State", field: "custState", width: 60, resizable: false }
+        ];
+
+        var columnsHistory = [
+        { id: "historyDate", name: "Date", field: "historyDate", width: 119, resizable: false },
+        { id: "historyStore", name: "Store", field: "historyStore", width: 120, resizable: false },
+        { id: "historySupplier", name: "Brand", field: "historySupplier", width: 50, resizable: false },
+        { id: "historyStyle", name: "Style", field: "historyStyle", width: 100, resizable: false },
+        { id: "historyColor", name: "Color", field: "historyColor", width: 70, resizable: false },
+        { id: "historySize", name: "Size", field: "historySize", width: 100, resizable: false },
+        { id: "historyVariance", name: "Other", field: "historyVariance", width: 50, resizable: false },
+        { id: "historyDescription", name: "Description", field: "historyDescription", width: 230, resizable: false },
+        { id: "historyQuantity", name: "Qty", field: "historyQuantity", width: 40, resizable: false }
+        ]
+
+        var options2 = {
+            editable: false,
+            autoEdit: false,
+
+            enableAddRow: false,
+            enableCellNavigation: true,
+            multiSelect: false,
+            enableColumnReorder: false,
+            asyncEditorLoading: false
+        }
+        </script>
+    <!-- Initialization -->
+    <script type="text/javascript">
+        $(function () {
+
+            gridCust = new Slick.Grid("#getCustomerGrid", dataCust, columnsCustomer, options2);
+            gridCust.setSelectionModel(new Slick.RowSelectionModel());
+            gridHistory = new Slick.Grid('#getHistoryGrid', dataHistory, columnsHistory, options2);
+            gridHistory.setSelectionModel(new Slick.RowSelectionModel());
+
+            $('body').bind("contextmenu", function (e) {
+                e.preventDefault();
+            });
+
+            gridCust.onDblClick.subscribe(function (e, args) {
+                $('#getCustomerSelect').trigger('click');
+            });
+        });
+    </script>
+    <!-- Page-specific Utility Javascript -->
+    <script type="text/javascript">
+        // show and hide the message box
+        function showMsg(msg) {
+            $('#msgText').text(msg);
+            $('#msgBox').show();
+            $('#_msgBox').show();
+        };
+        $('#btnMsgOK').click(function () {
+            $('#_msgBox').hide();
+            $('#msgBox').hide();
+        });
+        $('#btnHistory').click(function () {
+            if (testCustomer() == false) { return };
+            var dtVar = Math.round(Math.random() * 10);
+            var mDate = new Date();
+            mDate.setDate(mDate.getDate() - dtVar);
+            var dh = (dataHistory[0] = {});
+            var sDate = shortDays[mDate.getDay()] + ', ' + shortMonths[mDate.getMonth()] + ' ' + mDate.getDate() + ', ' + mDate.getFullYear();
+            dh['historyDate'] = sDate;
+            dh['historyStore'] = 'Sandy Springs';
+            dh['historySupplier'] = 'PSU';
+            dh['historyStyle'] = '7200';
+            dh['historyColor'] = 'KHA';
+            dh['historySize'] = '6XR';
+            dh['historyVariance'] = '';
+            dh['historyDescription'] = 'SLACKS, GIRLS, ELAS';
+            dh['historyQuantity'] = '2';
+
+            var dh = (dataHistory[1] = {});
+            dh['historyDate'] = sDate;
+            dh['historyStore'] = 'Sandy Springs';
+            dh['historySupplier'] = 'PSU';
+            dh['historyStyle'] = '6000';
+            dh['historyColor'] = 'NVY';
+            dh['historySize'] = 'YM';
+            dh['historyVariance'] = '';
+            dh['historyDescription'] = 'CARDIGAN, CREWNECK';
+            dh['historyQuantity'] = '1';
+
+            gridHistory.invalidate();
+            gridHistory.render();
+
+            $('#form1').hide();
+            $('#getHistoryMessage').text('History');
+            $('#getHistory').show();
+
+        });
+        $('#exitHistory, #doneHistory').click(function () {
+            $('#getHistory').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+
+        $('#btnClearCustomer').click(function () {
+            clearCustomer();
+        });
+
+        // Customer Notes
+        $('#btnCustomerNotes').click(function () {
+            if (testCustomer() == false) { return };
+            $('#notesArea').text(CustomerNotes);
+            $('#form1').hide();
+            $('#CustomerNotes').show();
+        });
+        $('#updateCustomerNotes').click(function () {
+            CustomerNotes = $('#notesArea').text();
+            $('#CustomerNotes').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+        $('#exitCustomerNotes').click(function () {
+            $('#notesArea').text('')
+            $('#CustomerNotes').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+
+        // keyboard
+        $('body').keydown(function (e) {
+            //see if we are processing a phone number
+            //var unicode = e.keyCode ? e.keyCode : e.charCode
+
+            if (e.altKey || e.ctrlKey) {
+                if (e.stopPropagation) e.stopPropagation();
+                if (e.preventDefault) e.preventDefault();
+                e.returnValue = false;
+                return false;
+            }
+
+            if ((e.target.id == 'phone') || (e.target.id == 'altphone')) {
+                var returnNumber = processPhone($('#international').prop("checked"), e);
+                if (returnNumber == 0) {
+                    $('#international').prop("checked", false)
+                } else if (returnNumber == 1) {
+                    $('#international').prop("checked", true)
+                }
+                //don't exit if cr or tab -- > 1
+                if (returnNumber < 2) {
+                    if (e.stopPropagation) e.stopPropagation();
+                    if (e.preventDefault) e.preventDefault();
+                    e.returnValue = false;
+                    e.target.focus();
+                    return false;
+                }
+            }
+
+            if ((e.target.id == 'sphone') || (e.target.id == 'saltphone')) {
+                var returnNumber = processPhone($('#shipinternational').prop("checked"), e);
+                if (returnNumber == 0) {
+                    $('#shipinternational').prop("checked", false)
+                } else if (returnNumber == 1) {
+                    $('#shipinternational').prop("checked", true)
+                }
+                //don't exit if cr or tab -- > 1
+                if (returnNumber < 2) {
+                    if (e.stopPropagation) e.stopPropagation();
+                    if (e.preventDefault) e.preventDefault();
+                    e.returnValue = false;
+                    e.target.focus();
+                    return false;
+                }
+            }
+
+            //adjust for keypad
+            if (e.which >= 96 && e.which <= 105) {
+                e.which -= 48;
+            }
+
+            //ignore TAB
+            if (e.which == 9 || e.which == 16) {
+                return true;
+            }
+
+            //adjust for CR or arrow down or page down
+            if (e.which == $.ui.keyCode.ENTER || e.which == 40 || e.which == 34) {
+                if (e.target.type == 'textarea') { return true; }
+                var x = document.getElementsByTagName("input");
+                for (var i = 0; i < x.length; i++) {
+                    if (e.target.id == x[i].id && i < x.length - 1) {
+                        if (x[i + 1].type == "text") {
+                            $('#' + x[i + 1].id).focus();
+                            break;
+                        } else if (i <= 27 && x[i + 4].type == "text") {
+                            $('#' + x[i + 4].id).focus();
+                            break;
+                        } else { break; }
+                    }
+                }
+                return false;
+            }
+
+            //adjust for arrow up or page up
+            if (e.which == 33 || e.which == 38) {
+                if (e.target.type == 'textarea') { return true; }
+                var x = document.getElementsByTagName("input");
+                for (var i = 0; i < x.length; i++) {
+                    if (e.target.id == x[i].id && i < x.length) {
+                        if (i >= 1 && x[i - 1].type == "text") {
+                            $('#' + x[i - 1].id).focus();
+                            break;
+                        } else if (i >= 4 && x[i - 4].type == "text" && x[i - 4].id != "") {
+                            $('#' + x[i - 4].id).focus();
+                            break;
+                        } else { break; }
+                    }
+                }
+                return false;
+            }
+
+            //test for backspace, escape or delete keys
+            if ((e.target.type == 'text' || e.target.type == 'textarea') && (e.which == 8 || e.which == 27 || e.which == 46)) {
+                // pass backspace to form if text type input
+                return true;
+            } else {
+                // review other codes to see if they should be blocked
+                for (var t = 0; t < blockedKeysArr.length; t++) {
+                    if (e.which == blockedKeysArr[t]) {
+                        //alert("Key Code: " + window.event.keyCode + " This action is not allowed");
+                        if (e.which != 16 && e.which != 17) {
+                            window.event.keyCode = 503;
+                        }; //shift, control
+                        if (e.stopPropagation) e.stopPropagation();
+                        if (e.preventDefault) e.preventDefault();
+                        return false;
+                    }
+                }
+                return true;
+            }
+        });
+
+        // Complete phone number?
+        $('#phone').blur(function () {
+            setTimeout(function () {
+                if (testPhoneNumbers('phone', 'phonelabel')) {
+                    if ($('#altphone').val().length >= 12 && $('#phone').val().length == 0) {
+                        showMsg('You must have a primary phone number.');
+                        $('#phone').focus();
+                    } else if ($('#phone').val().length >= 12) {
+                        for (var i = 0; i < 5; i++) {
+                            var c = (dataCust[i] = {});
+                            c['custLastName'] = 'SUSTAK' + i;
+                            c['custFirstName'] = 'BOB';
+                            c['custAddress'] = '745 HUNTING VIEW PT NW';
+                            c['custCity'] = 'SANDY SPRINGS';
+                            c['custState'] = 'GA';
+                        }
+
+
+                        gridCust.invalidate();
+                        gridCust.render();
+                        $('#form1').hide();
+                        $('#getCustomerMessage').text($('#phone').val());
+                        $('#getCustomer').show();
+                    }
+                }
+
+            }, 100);
+        });
+        $('#exitGetCustomer, #getCustomerNone').click(function () {
+            $('#getCustomer').hide();
+            $('#form1').show();
+        });
+        $('#getCustomerSelect').click(function () {
+            var custRow = gridCust.getSelectedRows();
+
+            isAddressFromPhoneNumber = true;
+            is_downloaded_customer = true;
+            c_altphone = '';
+            c_customerNotes = '';
+            if (dataCust[custRow[0]]['custRes'] == true) {
+                c_residential == true;
+                $('#residential').prop('checked', 'checked');
+            } else {
+                c_residential == false;
+                $('#business').prop('checked', 'checked');
+            }
+            c_lastName = dataCust[custRow[0]]['custLastName'];
+            $('#lastName').val(c_lastName);
+            c_firstName = dataCust[custRow[0]]['custFirstName'];
+            $('#firstName').val(c_firstName);
+            c_address1 = dataCust[custRow[0]]['custAddress1'];
+            $('#address1').val(c_address1);
+            c_address2 = dataCust[custRow[0]]['custAddress2'];
+            $('#address2').val(c_address2);
+            c_city = dataCust[custRow[0]]['custCity'];
+            $('#city').val(c_city);
+            c_state = dataCust[custRow[0]]['custState'];
+            $('#state').val(c_state);
+            c_zipCode = dataCust[custRow[0]]['custZip'];
+            $('#zipCode').val(c_zipCode);
+            c_country = dataCust[custRow[0]]['custCountry'];
+            $('#country').val(c_country);
+            c_phone = dataCust[custRow[0]]['custPhone1'];
+            $('#phone').val(c_phone);
+            c_email = dataCust[custRow[0]]['custEmail'];
+            $('#email').val(c_email);
+            c_cschool = dataCust[custRow[0]]['custSchool'];
+            $('#cschool').val(c_cschool);
+            $('#bschool').val(c_cschool);
+            CurrentSchool = c_cschool;
+            CustomerSchool = c_cschool;
+            c_cschoolid = dataCust[custRow[0]]['custSchoolId'];
+            CurrentSchoolId = c_cschoolid;
+            CustomerSchoolId = c_cschoolid;
+            //data[data.length - 1]['return_reason_code'] = dataCust[custRow[0]]['id'];
+            $('#getCustomer').hide();
+            $('#form1').show();
+        });
+        $('#altphone').blur(function () {
+            if (testPhoneNumbers('altphone', 'altphonelabel') && $('#altphone').val().length >= 12 && $('#phone').val().length == 0) {
+                showMsg('You must have a primary phone number.');
+                $('#phone').focus();
+            }
+        });
+
+        // Complete shipping phone number?
+        $('#sphone').blur(function () {
+            if (testPhoneNumbers('sphone', 'sphonelabel') && $('#saltphone').val().length >= 12 && $('#sphone').val().length == 0) {
+                showMsg('You must have a primary phone number.');
+                $('#sphone').focus();
+            }
+        });
+        $('#saltphone').blur(function () {
+            if (testPhoneNumbers('saltphone', 'saltphonelabel') && $('#saltphone').val().length >= 12 && $('#sphone').val().length == 0) {
+                showMsg('You must have a primary phone number.');
+                $('#sphone').focus();
+            }
+        });
+
+        // test phone numbers
+        function testPhoneNumbers(oPhone, oLabel) {
+            var oCurrent = $('#' + oPhone).val().length;
+
+            if ($('#international').prop("checked") == true) {
+                $('#' + oLabel).css('color', 'black');
+                return true;
+            }
+            // test if empty or complete
+            if ((oCurrent == 0) || (oCurrent >= 12)) {
+                // yes, done
+                $('#' + oLabel).css('color', 'black');
+                return true;
+            }
+
+            // error message
+            $('#' + oLabel).css('color', 'red');
+            showMsg('Please correct the phone number.');
+            setTimeout(function () {
+                $('#' + oPhone).focus();
+            }, 100);
+            cursorAtEnd(oPhone);
+            return false;
+        };
+
+        // put cursor at the end
+        function cursorAtEnd(id) {
+            var elem = document.getElementById(id);
+            var caretPos = $('#' + id).val().length;
+            if (elem.createTextRange) {
+                //IE
+                var range = elem.createTextRange();
+                range.move('character', caretPos);
+                range.select();
+            }
+            else {
+                //other
+                if (elem.selectionStart) {
+                    elem.focus();
+                    elem.setSelectionRange(caretPos, caretPos);
+                }
+                else
+                    elem.focus();
+            }
+        };
+
+        // Shipping
+        $('#shipping').dblclick(function () {
+            if (!isChangeApproved) {
+                isChangeApproved = createPopupDialog('SupervisorOverride.html', '');
+            }
+            if (isChangeApproved) {
+                if (isNoShipping) {
+                    isNoShipping = false;
+                } else {
+                    isNoShipping = true;
+                }
+                sumExtendedPrice();
+            }
+        });
+
+        // *** Customer ***
+
+        // Last name to upper case
+        $("#lastName").blur(function () {
+            $("#lastName").val($("#lastName").val().toUpperCase());
+        });
+
+        // First name to upper case
+        $("#firstName").blur(function () {
+            $("#firstName").val($("#firstName").val().toUpperCase());
+        });
+
+        // Address 1 to upper case
+        $("#address1").blur(function () {
+            if ($("#address1").val() == '') { return }
+            if (!addrs1Parsed) {
+                $("#address1").val(parseAddress($("#address1").val()));
+                addrs1Parsed = true;
+            } else {
+                $("#address1").val($("#address1").val().toUpperCase());
+            }
+        });
+
+        // Address 2 to upper case
+        $("#address2").blur(function () {
+            if ($("#address2").val() == '') { return }
+            if (!addrs2Parsed) {
+                $("#address2").val(parseAddress($("#address2").val()));
+                addrs2Parsed = true;
+            } else {
+                $("#address2").val($("#address2").val().toUpperCase());
+            }
+        });
+
+        // ZIP Code
+        $('#zipCode').blur(function () {
+            if ($('#zipCode').val() == '') return;
+            var city = $("#city");
+            var countryText = $("#country").val();
+            if (!countryText) {
+                countryText = "US"
+            }
+
+            if (!city.val()) {
+                request = "http://www.geonames.org/postalCodeLookupJSON?&country=" + countryText + "&callback=?"
+                $.getJSON(request, {
+                    postalcode: $("#zipCode").val()
+                },
+                function (response) {
+                    if (!city.val() && response && response.postalcodes.length && response.postalcodes[0].placeName) {
+                        city.val(response.postalcodes[0].placeName.toUpperCase());
+                        $("#state").val(response.postalcodes[0].adminCode1.toUpperCase());
+                        $("#country").val(response.postalcodes[0].countryCode.toUpperCase());
+                    }
+                })
+            }
+        });
+
+        // City to upper case
+        $("#city").blur(function () {
+            $("#city").val($("#city").val().toUpperCase());
+        });
+
+        // State to upper case
+        $("#state").blur(function () {
+            $("#state").val($("#state").val().toUpperCase().substring(0, 2));
+            // test against valid states
+        });
+
+        // Country to upper case
+        $("#country").blur(function () {
+            $("#country").val($("#country").val().toUpperCase().substring(0, 2));
+        });
+
+        // Email validation
+        $("#email").blur(function () {
+            if ($('#email').val() == '') return;
+            if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test($('#email').val())) {
+                showMsg('You have entered an invalid email address.');
+                $('#email').focus();
+            }
+        });
+
+        // *** Shipping ***
+
+        // Last name to upper case
+        $("#slastName").blur(function () {
+            $("#slastName").val($("#slastName").val().toUpperCase());
+        });
+
+        // First name to upper case
+        $("#sfirstName").blur(function () {
+            $("#sfirstName").val($("#sfirstName").val().toUpperCase());
+        });
+
+        // Address 1 to upper case
+        $("#saddress1").blur(function () {
+            if ($("#saddress1").val() == '') { return }
+            if (!saddrs1Parsed) {
+                $("#saddress1").val(parseAddress($("#saddress1").val()));
+                saddrs1Parsed = true;
+            } else {
+                $("#saddress1").val($("#saddress1").val().toUpperCase());
+            }
+        });
+
+        // Address 2 to upper case
+        $("#saddress2").blur(function () {
+            if ($("#saddress2").val() == '') { return }
+            if (!saddrs2Parsed) {
+                $("#saddress2").val(parseAddress($("#saddress2").val()));
+                saddrs2Parsed = true;
+            } else {
+                $("#saddress2").val($("#saddress2").val().toUpperCase());
+            }
+        });
+
+        // ZIP Code
+        $('#szipCode').blur(function () {
+            if ($('#szipCode').val() == '') return;
+            var city = $("#scity");
+            var countryText = $("#scountry").val();
+            if (!countryText) {
+                countryText = "US"
+            }
+
+            if (!city.val()) {
+                request = "http://www.geonames.org/postalCodeLookupJSON?&country=" + countryText + "&callback=?"
+                $.getJSON(request, {
+                    postalcode: $("#szipCode").val()
+                },
+                function (response) {
+                    if (!city.val() && response && response.postalcodes.length && response.postalcodes[0].placeName) {
+                        city.val(response.postalcodes[0].placeName.toUpperCase());
+                        $("#sstate").val(response.postalcodes[0].adminCode1.toUpperCase());
+                        $("#scountry").val(response.postalcodes[0].countryCode.toUpperCase());
+                    }
+                })
+            }
+        });
+
+        // City to upper case
+        $("#scity").blur(function () {
+            $("#scity").val($("#scity").val().toUpperCase());
+        });
+
+        // State to upper case
+        $("#sstate").blur(function () {
+            $("#sstate").val($("#sstate").val().toUpperCase().substring(0, 2));
+            // test against valid states
+        });
+
+        // Country to upper case
+        $("#scountry").blur(function () {
+            $("#scountry").val($("#scountry").val().toUpperCase().substring(0, 2));
+        });
+
+        // Email validation
+        $("#semail").blur(function () {
+            if ($('#semail').val() == '') return;
+            if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test($('#semail').val())) {
+                showMsg('You have entered an invalid email address.');
+                $('#semail').focus();
+            }
+        });
+
+        $('#cschool').click(function () {
+            $('#cschool').val('');
+        });
+        $('#cschool').blur(function () {
+            if ($('#cschool').val() == "") { $('#cschool').val(CustomerSchool) }
+        });
+
+        $('#btnSave').click(function () {
+            if (!testCustomer()) { return };
+
+
+            clearCustomer();
+        });
+
+        function testCustomer() {
+            var ret = true;
+
+            if ($('#phone').val() == '') {
+                ret = false;
+                $('#phonelabel').css('color', 'red');
+            } else {
+                $('#phonelabel').css('color', 'black');
+            };
+            if ($('#lastName').val() == '') {
+                ret = false;
+                $('#lastnamelabel').css('color', 'red');
+            } else {
+                $('#lastnamelabel').css('color', 'black');
+            };
+            if ($('#firstName').val() == '') {
+                ret = false;
+                $('#firstnamelabel').css('color', 'red');
+            } else {
+                $('#firstnamelabel').css('color', 'black');
+            };
+            if ($('#address1').val() == '') {
+                ret = false;
+                $('#address1label').css('color', 'red');
+            } else {
+                $('#address1label').css('color', 'black');
+            };
+            if ($('#city').val() == '') {
+                ret = false;
+                $('#citylabel').css('color', 'red');
+            } else {
+                $('#citylabel').css('color', 'black');
+            };
+            if ($('#state').val() == '') {
+                ret = false;
+                $('#statelabel').css('color', 'red');
+            } else {
+                $('#statelabel').css('color', 'black');
+            };
+            if ($('#zipCode').val() == '') {
+                ret = false;
+                $('#zipcodelabel').css('color', 'red');
+            } else {
+                $('#zipcodelabel').css('color', 'black');
+            };
+            if ($('#country').val() != 'US' && $('#country').val() == '') {
+                ret = false;
+                $('#countrylabel').css('color', 'red');
+            } else {
+                $('#countrylabel').css('color', 'black');
+            };
+            if ($('#cschool').val() == '') {
+                ret = false;
+                $('#cschoollabel').css('color', 'red');
+            } else {
+                $('#cschoollabel').css('color', 'black');
+            };
+
+            var ship = false;
+            if ($('#sphone').val() != '') { ship = true };
+            if ($('#saltphone').val() != '') { ship = true };
+            if ($('#slastName').val() != '') { ship = true };
+            if ($('#sfirstName').val() != '') { ship = true };
+            if ($('#saddress1').val() != '') { ship = true };
+            if ($('#saddress2').val() != '') { ship = true };
+            if ($('#scity').val() != '') { ship = true };
+            if ($('#sstate').val() != '') { ship = true };
+            if ($('#szipCode').val() != '') { ship = true };
+            if ($('#scountry').val() != 'US' && $('#scountry').val() != '') { ship = true };
+            if ($('#semail').val() != '') { ship = true };
+
+            if (ship == true) {
+                if ($('#sphone').val() == '') {
+                    ret = false;
+                    $('#sphonelabel').css('color', 'red');
+                } else {
+                    $('#sphonelabel').css('color', 'black');
+                };
+                if ($('#slastName').val() == '') {
+                    ret = false;
+                    $('#slastnamelabel').css('color', 'red');
+                } else {
+                    $('#slastnamelabel').css('color', 'black');
+                };
+                if ($('#sfirstName').val() == '') {
+                    ret = false;
+                    $('#sfirstnamelabel').css('color', 'red');
+                } else {
+                    $('#sfirstnamelabel').css('color', 'black');
+                };
+                if ($('#saddress1').val() == '') {
+                    ret = false;
+                    $('#saddress1label').css('color', 'red');
+                } else {
+                    $('#saddress1label').css('color', 'black');
+                };
+                if ($('#scity').val() == '') {
+                    ret = false;
+                    $('#scitylabel').css('color', 'red');
+                } else {
+                    $('#scitylabel').css('color', 'black');
+                };
+                if ($('#sstate').val() == '') {
+                    ret = false;
+                    $('#sstatelabel').css('color', 'red');
+                } else {
+                    $('#sstatelabel').css('color', 'black');
+                };
+                if ($('#szipCode').val() == '') {
+                    ret = false;
+                    $('#szipcodelabel').css('color', 'red');
+                } else {
+                    $('#szipcodelabel').css('color', 'black');
+                };
+                if ($('#scountry').val() != 'US' && $('#scountry').val() == '') {
+                    ret = false;
+                    $('#scountrylabel').css('color', 'red');
+                } else {
+                    $('#scountrylabel').css('color', 'black');
+                };
+            }
+            if (ret == false) {
+                showMsg('Please correct the customer information.');
+            }
+            return ret;
+        };
+
+
+        function jsonpcallback(data) {
+            if (data.results[0]) {
+                $.each(data, function (i, item) {
+                    alert(i + ", " + item);
+                });
+            } else {
+                alert('Data Error');
+            }
+        };
+       
+        
+        $('#testAvalara').click(function () {
+            var url = 'https://development.avalara.net/1.0/address/validate';
+
+            var request = 'Line1=' + replaceAll($('#address1').val(), ' ', '+');
+            if ($('#address2').val() != '') { request = request + '&Line2=' + replaceAll($('#address2').val(), ' ', '+') };
+            request = request + '&City=' + replaceAll($('#city').val(), ' ', '+');
+            request = request + '&Region=' + $('#state').val();
+            request = request + '&Country=' + $('#country').val();
+            request = request + '&PostalCode=' + $('#zipCode').val();
+            //63P@rk3r11
+
+            $.ajax({
+                type: "GET",
+                url: url,
+                contentType: "application/json; charset=UTF-8",
+                //contentType: "text/xml; charset=UTF-8",
+                data: request,
+                dataType: "jsonp",
+                crossDomain: true,
+                success: function (data) {
+                    alert(data);
+                    //var json = $.parseJSON(data);
+                    var x = 3;
+                },
+                error: function err(XMLHttpRequest, status, error) {
+                    alert(JSON.stringify(XMLHttpRequest) + '\n' + error + ', ' + '\n' + status + '\n' + XMLHttpRequest.responseText);
+                },
+                beforeSend: function setHeader(XMLHttpRequest) {
+                    XMLHttpRequest.setRequestHeader('Authorization', 'Basic MTEwMDEwNDczNTowNEMxQTkyRUFEODhFQzhE'); //Account Number:License Key
+                    //XMLHttpRequest.setRequestHeader('Authorization', 'Basic c3VzdGFrQGdtYWlsLmNvbTo2M1BAcmszcjEx'); //Username:Password
+                    XMLHttpRequest.withCredentials = true;
+                }
+            });
+        });
+        $('#testAvalaraXMLHttpRequest').click(function () {
+            var url = 'https://development.avalara.net/1.0/address/validate';
+            var request = 'Line1=' + replaceAll($('#address1').val(), ' ', '+');
+            if ($('#address2').val() != '') { request = request + '&Line2=' + replaceAll($('#address2').val(), ' ', '+') };
+            request = request + '&City=' + replaceAll($('#city').val(), ' ', '+');
+            request = request + '&Region=' + $('#state').val();
+            request = request + '&Country=' + $('#country').val();
+
+            var invocation = new XMLHttpRequest();
+            if (invocation) {
+                invocation.open('GET', url, true);
+                invocation.setRequestHeader('Authorization', 'Basic MTEwMDEwNDczNTowNEMxQTkyRUFEODhFQzhE'); //Account Number:License Key
+                //invocation.setRequestHeader('Authorization', 'Basic c3VzdGFrQGdtYWlsLmNvbTo2M1BAcmszcjEx'); //Username:Password
+                //invocation.setRequestHeader("Content-Type", "application/json");
+                //invocation.setRequestHeader("jsonp", "GeoTaxResponse");
+                invocation.onreadystatechange = handleData;
+                invocation.send(request);
+            }
+
+            function handleData(evtXHR) {
+                if (invocation.readyState == 4) {
+                    if (invocation.status == 200) {
+                        var json = $.parseJSON(invocation.responseText)
+                        $.each(json.result.records, function (i, item) {
+                            $.each(item, function (k, v) {
+                                alert(k + " " + v);
+                            });
+                        });
+                    } else if (invocation.status == 500) {
+                        showMsg('Internal Server Error.');
+                    } else if (invocation.status == 503) {
+                        showMsg('Sevice Unavailable.');
+                    } else {
+                        showMsg('Invocation Errors Occured; Status: ' + invocation.status);
+                    }
+                }
+            };
+        });
+    </script>
+</body>
+</html>

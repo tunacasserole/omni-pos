@@ -1,9 +1,644 @@
 ﻿<!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Parker POS</title>
+    <link rel="stylesheet" href="Styles/Site.css" type="text/css" />
+    <script type="text/javascript" src="Scripts/jquery-1.8.1.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.23.custom.min.js"></script>
+    <style type="text/css">
+    #waiting {
+        position: absolute;
+        top: 340px;
+        left: 500px;
+        border: none !important;
+        z-index: 9001;
+        display: none;
+    }
+    input:focus { 
+        outline:none;
+        border-color:#ff9933;
+        box-shadow:0 0 5px #ff9933 inset;
+    }
+    #msgBox {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            border: none;
+            width: 1020px;
+            height: 764px;
+            /*background: white transparent scroll repeat 0% 0%;*/
+            background: white;
+            opacity: 0.4;
+            filter:alpha(opacity=40);
+            pointer-events:visible;
+            z-index: 9997;
+        }
+        #_msgBox {
+            position: absolute;
+            top: 270px;
+            left: 310px;
+            width: 400px;
+            height: 200px;
+            background-color: rgba(255, 168, 64, 1.0) !important;
+            color: white !important;
+            border: 3px solid white !important;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            z-index: 9998;
+        }
+    </style>
+    <script type="text/javascript">
+        var machineid = '';
+
+        function createCookie(name, value, days) {
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                var expires = "; expires=" + date.toGMTString();
+            }
+            else var expires = "";
+            document.cookie = name + "=" + value + expires + "; path=/";
+        };
+
+        function readCookie(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        };
+
+        function eraseCookie(name) {
+            createCookie(name, "", -1);
+        };
+    </script>
 </head>
 <body>
-Parker POS Landing Page
+    <div class="page">
+        <div class="header">
+            <div class="title">
+                <h1>
+                    Parker POS
+                </h1>
+            </div>
+            <div class="clear hideSkiplink">
+                <button id="Logout" class="headerButton">Logout</button>
+                <button id="Home" class="headerButton" style="display:none">Home</button>
+                <button id="About" class="headerButton" style="display:none">About</button>
+            </div>
+        </div>
+        <div class="main">
+            <div id="oLogin">
+                <h2>
+                    Log In
+                </h2>
+                <p>
+                    Please enter your username and password.
+                </p>
+                <div class="accountInfo">
+                    <fieldset class="login">
+                        <legend>Account Information</legend>
+                        <p id="un" style="color:red; display:none;">
+                            User Name/Password is required
+                        </p>
+                        <p>
+                            <label id="UserNameLabel" for="UserName">Username:</label>
+                            <input type="text" id="UserName" class="textEntry" />
+                        </p>
+                        <p>
+                            <label id="PasswordLabel" for="Password">Password:</label>
+                            <input type="password" id="Password" runat="server" class="passwordEntry" />
+                        </p>
+                    </fieldset>
+                    <p class="submitButton">
+                        <button id="LoginButton" >Log In</button>
+                    </p>
+
+                </div>
+            </div>
+            <div id="oHome" style="display:none">
+                <div>
+                    <h3>Select from the following:</h3>
+                </div>
+                <div id="leftcolumn" style="
+	                position: absolute;
+                    top: 120px;
+                    margin: 20px auto 0px auto;
+                    width: 40%;
+                    overflow: auto;
+                    border-collapse: collapse
+                    ">
+                    <ol class="round">
+                        <li class="zero">
+                            <h5>Start a New Order</h5>
+                            <button id="btnOrder" type="button" class="defaultButton" onclick="javascript:neworder('Order.html',false);" style="background-color:#f7f8a7">New Order</button>
+                        </li>
+                        <li class="one">
+                            <h5>Phone Order</h5>
+                            <button id="btnPhone" type="button" class="defaultButton" onclick="javascript:neworder('Order.html',true);" style="background-color:dodgerblue; color:white;">Phone Order</button>
+                        </li>
+                        <li class="two">
+                            <h5>Pick Up</h5>
+                            <button id="btnBackorder" type="button" class="defaultButton" onclick="javascript:openReplacementWindow('Pickup.html')">Pick up an Order</button>
+                        </li>
+                        <li class="three
+                            ">
+                            <h5>Customer Information</h5>
+                            <button id="btnCustomer" type="button" class="defaultButton" onclick="javascript:openReplacementWindow('Customer.html')">Edit an Existing or Add a New Customer</button>
+                        </li>
+                    </ol>
+                </div>
+                <div id="rightcolumn" style="
+                    position: absolute;
+                    top: 120px;
+                    left: 50%;
+                    margin: 20px auto 0px auto;
+                    width: 40%;
+                    overflow: auto;
+                    border-collapse: collapse;
+                    ">
+                    <ol class="round">
+                        <li class="four">
+                            <h5>Till Management</h5>
+                            <button id="btnTill" type="button" class="defaultButton" onclick="javascript:openReplacementWindow('Till.html')">Enter Till Amounts, Move Till, Loans & Pickups</button>
+                        </li>
+                        <li class="five">
+                            <h5>ADP Time Clock</h5>
+                            <button id="btnTimeClock" type="button" class="defaultButton" onclick="javascript:window.showModalDialog('https://portal.adp.com/wps/employee/employee.jsp','','center:yes')">Time Clock</button>
+                        </li>
+                        <li class="six">
+                            <h5>Administrative Functions</h5>
+                            <button id="btnAdmin" type="button" class="defaultButton" onclick="javascript:showAdministrative()") >Administration</button>
+                        </li>
+                        <li class="seven">
+                            <h5>Main</h5>
+                            <button id="btnBack" type="button" class="defaultButton" onclick="javascript: history.go(-1)" style="background-color:#ccf8a2;">Return to Main System</button>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            <div id="oAdmin" style="display:none">
+                <div>
+                    <h3>Select from the following:</h3>
+                </div>
+                <div id="leftcolumn2" style="
+	                position: absolute;
+                    top: 120px;
+                    margin: 20px auto 0px auto;
+                    width: 40%;
+                    overflow: auto;
+                    border-collapse: collapse
+                    ">
+                    <ol class="round">
+                        <li class="zero">
+                            <h5>Pick Tickets</h5>
+                            <button id="btnPickTickets" type="button" class="defaultButton" onclick="javascript:openReplacementWindow('PickTickets.html');">Pick Tickets</button>
+                        </li>
+                        <li class="one">
+                            <h5>Work Orders</h5>
+                            <button id="btnWorkOrders" type="button" class="defaultButton" onclick="javascript:openReplacementWindow('WorkOrders.html');">Work Orders</button>
+                        </li>
+                        <li class="two">
+                            <h5>Shipping</h5>
+                            <button id="btnShipping" type="button" class="defaultButton" onclick="javascript:openReplacementWindow('ReceiveShipments.html');">Receive Shippments</button>
+                        </li>
+                    </ol>
+                </div>
+                <div id="rightcolumn2" style="
+                    position: absolute;
+                    top: 120px;
+                    left: 50%;
+                    margin: 20px auto 0px auto;
+                    width: 40%;
+                    overflow: auto;
+                    border-collapse: collapse;
+                    ">
+                    <ol class="round">
+                        <li class="three">
+                            <h5>Adjust QOH</h5>
+                            <button id="btnAdjustQuantity" type="button" class="defaultButton" onclick="javascript:openReplacementWindow('AdjustQty.html');">Adjust Item Quantity on Hand</button>
+                        </li>
+                        <li class="four">
+                            <h5>Physical Inventory</h5>
+                            <button id="btnPhysicalInventory" type="button" class="defaultButton" onclick="javascript:openReplacementWindow('PhysInventory.html');">Physical Inventory</button>
+                        </li>
+                        <li class="five">
+                            <h5>Omni Desktop</h5>
+                            <button id="btnOmni" type="button" class="defaultButton" onclick="javascript:gotoOmni();" >Omni Desktop</button>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            <div id ="oAbout" style="display:none">
+                <h2>
+                    About
+                </h2>
+                <p>
+                    Parker School Uniforms Point of Sale<br />
+                    <script type="text/javascript">
+                        copyright = new Date();
+                        current = copyright.getFullYear();
+                        document.write("Copyright &copy; 2012-" + current + " ");
+                    </script>
+                    <br />
+                    Version .9
+                </p>
+            </div>
+        </div>
+        <div class="clear">
+        </div>
+    </div>
+    <div class="footer">
+        <div style="
+            position: absolute;
+            top: 520px;
+            width:920px;
+            margin: 20px auto 0px auto;
+            font-size: 0.6em;
+            ">
+            <span id="showcopyright" style="float:right; clear:right;" title="copyright"></span>
+        </div>
+    </div>
+
+    <div id="waiting">
+        <img id="loading" alt="Loading" src="Images/loading.gif" style=" width:60px; height:60px;" />
+    </div>
+
+    <!-- Message Box (replaces alert) -->
+    <div id="msgBox" style="display:none;"></div>
+    <div id="_msgBox" style="display:none;">
+        <div style="text-align:center; margin-top:1em; border:none !important;">
+            <span id="msgText" style="font-size:1.5em; font-weight:bold;">Message!</span>
+        </div>
+        <div id="btnCenter" style="text-align:center; border:none !important;">
+            <button type="button" id="btnMsgOK" style="position: absolute; top: 150px; left: 170px; width: 60px; font-size:1.5em;">OK</button>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var d_is_login_per_transaction = true;
+        var savedUserName = '';
+        var shortLoginPassword = '';
+        var adminMode = false;
+        var isLoggedIn = false;
+        var machineid = '';
+        var version = "0.9";
+        var copyright = new Date();
+        var current = copyright.getFullYear();
+
+        $(document).ready(function () {
+            $('#waiting').show();
+            var doc = document.body;
+
+            if (document.fullscreenenabled) {
+                // W3C Proposal - HTML5
+                //alert("W3C");
+                doc.requestFullscreen();
+            }
+            else if (navigator.userAgent.toLowerCase().match(/firefox/) > 0) {
+                // Firefox
+                //alert("Firefox");
+                doc.mozRequestFullScreen();
+            }
+            else if (navigator.userAgent.toLowerCase().match(/chrome/) > 0) {
+                // Safari, Chrome Canary
+                //alert("Chrome");
+                doc.webkitRequestFullScreen(body.ALLOW_KEYBOARD_INPUT);
+            }
+            else if (navigator.userAgent.toLowerCase().match(/safari/) > 0) {
+                // Safari, Chrome Canary
+                //alert("Safari");
+                doc.webkitRequestFullScreen(doc.ALLOW_KEYBOARD_INPUT);
+            }
+            else {
+                // Internet Explorer
+                //alert("IE");
+                window.open("", "_self", "fullscreen=yes, scrollbars=auto");
+            };
+
+            $('body').bind("contextmenu", function (e) {
+                e.preventDefault();
+            });
+
+            var getAccess = readCookie("POS_Access");
+            if (getAccess != null) {
+                var namePtr = getAccess.indexOf(',');
+                savedUserName = getAccess.substring(0, namePtr);
+                shortLoginPassword = getAccess.substring(namePtr + 1);
+                $('#UserName').val(savedUserName);
+                $('#Password').focus();
+            };
+
+            machineid = readCookie("POS_MAC");
+            if (machineid != null) {
+                request = "http://www.geonames.org/registerLookupJSON?&callback=?"
+                $.getJSON(request, {
+                    register: MAC
+                },
+                function (response) {
+                    //terminal_id
+                    //location_id
+                    //local_server_ip
+                    //hq_server_url
+                    //register_sale_date
+                    createCookie("POS_RECEIPTPRINTER", receipt_printer_url + "|" + receipt_printer_ip, 365);
+                    //receipt_printer_url
+                    //receipt_printer_ip
+                    createCookie("POS_MONOGRAMPRINTER", tag_printer_url + "|" + tag_printer_ip, 365);
+                    //tag_printer_url
+                    //tag_printer_ip
+                    createCookie("POS_SERIALPORT", pin_pad_port, 365);
+                    //pin_pad_port
+                    //is_net_display_enabled
+                    d_is_login_per_transaction = is_login_per_transaction;
+                    //is_login_per_transaction
+                    //icon_url
+                    //icon_width
+                    //paper_width
+                    //display
+                    //feedback_message
+                    //return_policy
+                    //website_message
+                    //promotional_message
+                    //message_separator
+                })
+            } else { // BIG PROBLEM  
+                machineid = "000000000000";
+            };
+
+            $('#showcopyright').text(machineid + "    Version " + version + "    Copyright © 2012-" + current + " ");
+            //document.write(machineid + "&nbsp;&nbsp;&nbsp;&nbsp;Version&nbsp;" + version + "&nbsp;&nbsp;&nbsp;&nbsp;Copyright &copy; 2012-" + current + " &nbsp;");
+
+            if (!d_is_login_per_transaction) {
+                eraseCookie('POS_Access');
+                $('#oLogin').hide();
+                $('#oHome').show();
+                $('#Home').show();
+                $('#About').show();
+            }
+            $('#waiting').hide();
+        });
+
+        var blockedKeysArr = [
+        // allow tab (7), caps lock (20), page up (33), page down (34), end (35)
+        8,  // backspace - will go back a url
+        13, // enter
+        18, // alt
+        19, // pause, break
+        27, // escape
+        36, // home
+        45, // insert
+        // function keys 1 (112) - 12 (123)
+        //112,
+        113, 114, 115,
+        116, // F5
+        117, 118, 119, 120,
+        //121, // F10
+        //122, // F11
+        123
+        ];
+
+        $('body').keydown(function (e) {
+            if (e.ctrlKey || e.altKey) {
+                if (e.stopPropagation) e.stopPropagation();
+                if (e.preventDefault) e.preventDefault();
+                return false;
+            };
+            if (e.which == 13 && e.target.type == 'password') {
+                $('#LoginButton').trigger('click');
+                return false;
+            };
+
+            if (e.which == 121) { // F10
+                showMsg('Machine Address: ' + machineid.substr(0,4) + ' ' + machineid.substr(4,4) + ' ' + machineid.substr(8,4));
+                if (e.stopPropagation) e.stopPropagation();
+                if (e.preventDefault) e.preventDefault();
+                return false;
+            };
+
+            //adjust for keypad
+            if (e.which >= 96 && e.which <= 105) {
+                e.which -= 48;
+            }
+
+            //ignore TAB
+            if (e.which == 9 || e.which == 16) {
+                return true;
+            }
+
+            if ((e.target.type == 'text' || e.target.type == 'password') && (e.which == 8 || e.which == 35 || e.which == 36 || e.which == 37 || e.which == 39 || e.which == 46)) {
+                // pass backspace, end, home, left and right arrows to form if text type input
+                return true;
+            }
+            if ((e.target.type == 'text' || e.target.type == 'password') && e.which == 27) {
+                // clear entry if text type input
+                e.target.value = '';
+                return false;
+            }
+
+// ***** Redirection Maps of Buttons *****
+            if (isLoggedIn) {
+                if (e.which == 48) {
+                    // 0
+                    if (adminMode) {
+                        openReplacementWindow('PickTickets.html');
+                    } else {
+                        neworder('Order.html', false);
+                    }
+                    return false;
+                } else if (e.which == 49) {
+                    // 1
+                    if (adminMode) {
+                        openReplacementWindow('WorkOrders.html');
+                    } else {
+                        neworder('Order.html', true);
+                    }
+                    return false;
+                } else if (e.which == 50) {
+                    // 2
+                    if (adminMode) {
+                        openReplacementWindow('ReceiveShipments.html');
+                    } else {
+                        openReplacementWindow('Pickup.html');
+                    }
+                    return false;
+                } else if (e.which == 51) {
+                    // 3
+                    if (adminMode) {
+                        openReplacementWindow('AdjustQty.html');
+                    } else {
+                        openReplacementWindow('Customer.html');
+                    }
+                    return false;
+                } else if (e.which == 52) {
+                    // 4
+                    if (adminMode) {
+                        openReplacementWindow('PhysInventory.html');
+                    } else {
+                        openReplacementWindow('Till.html');
+                    }
+                    return false;
+                } else if (e.which == 53) {
+                    // 5
+                    if (adminMode) {
+                        gotoOmni();
+                    } else {
+                        window.showModalDialog('https://portal.adp.com/wps/employee/employee.jsp');
+                    }
+                    return false;
+                } else if (e.which == 54) {
+                    // 6
+                    showAdministrative();
+                    return false;
+                } else if (e.which == 55) {
+                    // 7
+                    javascript: history.go(-1);
+                    return false;
+// ***** End of Redirection Maps of Buttons *****
+
+                } else if (e.which == 112) {
+                    // F1
+                    var isIE = (document.all ? true : false);
+                    if (isIE) {
+                        document.onhelp = function () { return false; }
+                        window.onhelp = function () { return false; }
+                    }
+                    e.returnValue = false;
+                    e.keyCode = 0;
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }
+
+
+            // review other codes to see if they should be blocked
+            for (var t = 0; t < blockedKeysArr.length; t++) {
+                if (e.which == blockedKeysArr[t]) {
+                    //alert("Key Code: " + window.event.keyCode + " This action is not allowed");
+                    if (e.which != 16 && e.which != 17) { e.keycode = 503 }; //shift, control
+                    e.returnValue = false;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        $('#LoginButton').click(function () {
+            if ($('#UserName').val() == '' || $('#Password').val() == '') {
+                $('#un').show();
+                return;
+            }
+            $('#un').hide();
+
+            // login process
+            // don't forget shortLoginPassword
+
+
+            shortLoginPassword = 'x';
+
+            createCookie('POS_Access', $('#UserName').val() + "," + shortLoginPassword, 1);
+            $('#oLogin').hide();
+            $('#oHome').show();
+            $('#Home').show();
+            $('#About').show();
+            isLoggedIn = true;
+        });
+
+        $('#Logout').click(function () {
+            eraseCookie('POS_Access');
+            isLoggedIn = false;
+            $('#UserName').val('');
+            $('#UserName').focus();
+            $('#Password').val('');
+            $('#un').hide();
+            $('#oHome').hide();
+            $('#oAbout').hide();
+            $('#oAdmin').hide();
+            $('#Home').hide();
+            $('#About').hide();
+            $('#oLogin').show();
+            adminMode = false;
+        });
+
+        $('#Home').click(function () {
+            $('#Password').val('');
+            $('#Password').focus();
+            $('#un').hide();
+            $('#oLogin').hide();
+            $('#oAbout').hide();
+            $('#oAdmin').hide();
+            $('#oHome').show();
+            adminMode = false;
+        });
+
+        $('#About').click(function () {
+            $('#Password').val('');
+            $('#Password').focus();
+            $('#un').val('');
+            $('#oLogin').hide();
+            $('#oHome').hide();
+            $('#oAdmin').hide();
+            $('#oAbout').show();
+            adminMode = false;
+        });
+
+        function showAdministrative() {
+            $('#oLogin').hide();
+            $('#oHome').hide();
+            $('#oAbout').hide();
+            $('#oAdmin').show();
+            adminMode = true;
+        };
+
+        function showMsg(msg) {
+            $('#msgText').text(msg);
+            $('#msgBox').show();
+            $('#_msgBox').show();
+        };
+        $('#btnMsgOK').click(function () {
+            $('#_msgBox').hide();
+            $('#msgBox').hide();
+        });
+
+        function neworder(url, phoneorderflag) {
+            createCookie('POS_PhoneOrder', phoneorderflag, 1)
+            openReplacementWindow(url);
+        }
+
+        function gotoOmni() {
+            var url = "http://qa.psu.io/desktop.html";
+
+            var $dialog = $('<div></div>')
+                           .html('<iframe style="border: 0px; " src="' + url + '" width="100%" height="100%"></iframe>')
+                           .dialog({
+                               autoOpen: false,
+                               modal: true,
+                               position: 'top',
+                               height: 700,
+                               width: 1020,
+                               top: 0,
+                               buttons: { "Close": function () { $(this).dialog("close") } }
+                           }
+                           );
+            $(".ui-dialog-titlebar").hide();
+            $dialog.dialog('open');
+        }
+
+        function openReplacementWindow(url) {
+            $('#waiting').show();
+            window.open(url, '_self', 'fullscreen=yes,toolbar=no,status=no,menubar=no,resizable=no,directories=no,location=no,titlebar=no,scrollbars=no', false);
+            $('#waiting').hide();
+        };
+        function openNewWindow(url) {
+            $('#waiting').show();
+            window.open(url, '', 'fullscreen=no,left=0,height=700,width=900,toolbar=no,status=no,menubar=no,resizable=no,directories=no,location=no,titlebar=no,scrollbars=no', false);
+            $('#waiting').hide();
+        };
+</script>
 </body>
 </html>

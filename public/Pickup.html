@@ -1,0 +1,474 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+
+        <!-- Styles Used/Referenced -->
+    <link rel="stylesheet" href="Styles/Slick.Grid.css" type="text/css" />
+    <link rel="stylesheet" href="Styles/jquery-ui-1.8.23.custom.min.css" type="text/css" />
+    <link rel="stylesheet" href="Styles/examples.css" type="text/css" />
+    <link rel="stylesheet" href="Styles/datePicker.css" type="text/css" />
+    <link rel="stylesheet" href="Styles/POS.css" type="text/css" />
+
+    <!-- Javascript Imports -->
+    <script type="text/javascript" src="Scripts/jquery-1.8.1.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.23.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery.event.drag-2.0.min.js"></script>
+    <script type="text/javascript" src="Scripts/Slick.Core.js"></script>
+    <script type="text/javascript" src="Scripts/Slick.Grid.js"></script>
+    <script type="text/javascript" src="Scripts/Slick.RowSelectionModel.js"></script>
+    <script type="text/javascript" src="Scripts/date.js"></script>
+    <script type="text/javascript" src="Scripts/UUID.core.js"></script>
+    <script type="text/javascript" src="Scripts/datePicker.js"></script>
+    <script type="text/javascript" src="Scripts/POS.custom.js"></script>
+    <style type="text/css">
+         body {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 1024px;
+            height: 768px;
+            background-color: lightseagreen;
+            margin: 0 0 0 0;
+            border: none !important;
+            z-index: 2000;
+        }
+         #msgBox {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            border: none;
+            width: 1020px;
+            height: 764px;
+            /*background: white transparent scroll repeat 0% 0%;*/
+            background: white;
+            opacity: 0.4;
+            filter:alpha(opacity=40);
+            pointer-events:visible;
+            z-index: 9997;
+        }
+        #_msgBox {
+            position: absolute;
+            top: 270px;
+            left: 310px;
+            width: 400px;
+            height: 200px;
+            background-color: rgba(255, 168, 64, 1.0) !important;
+            color: white !important;
+            border: 3px solid white !important;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            z-index: 9998;
+        }
+    </style>
+    <script type="text/javascript">
+        function init() {
+            self.moveTo(0, 0);
+            self.resizeTo(1024, 768);
+
+            $('body').bind("contextmenu", function (e) {
+                e.preventDefault();
+            });
+        }
+    </script>
+</head>
+<body onload="init()">
+    <form id="form1" action="javascript:void(0);">
+        <div style="margin: 0; padding: 0; border:none;">
+            <img id='exitGetData' onclick="javascript: history.go(-1)" src="Images/round-exit.png" alt="Exit" style="position:absolute; left:960px; top:0px; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div style="text-align:center; margin:1em 0 1em 0; font-family:Arial; font-size: 18px; font-weight: bold; border:none !important; color:white">
+            Receipts
+        </div>
+        <div style="margin-bottom: 6em; border:none;">
+            <div style="position:absolute; left:42px; top:60px; border:none;">
+                <label style="color:white; padding-top:.3em">From Date:&nbsp;&nbsp;</label> <input type="text" id="fromDatepicker" class="date-pick"  />
+            </div>
+            <div style="position:absolute; left:298px; top:60px;  border:none;">
+                <label style="color:white; padding-top:.3em">To Date:&nbsp;&nbsp;</label> <input type="text" id="toDatepicker" class="date-pick"  />
+            </div>
+            <div style="position:absolute; left:540px; top:60px;  border:none;">
+                <label for="terminalsComboBox" style="color:white; padding-top:.3em">Location:&nbsp;&nbsp;</label>
+                <select name="terminals" id="terminalsComboBox" style='text-align:left; margin-top:.1em; width:280px;'>
+                    <option value="none">None</option>
+                </select>
+            </div>
+            <div style="position:absolute; left:890px; top:54px;  border:none;">
+                <button type="button" class="fbuttons" id="btnSearch" style="height: 30px; background-color:white;">Search</button>
+            </div>
+        </div>
+        <div id="getDataGrid" style="padding-bottom:0 !important; border:none !important;"></div>
+        <div style="position:absolute; left:56px; top:700px; border:none;">
+            <button type="button" class="fbuttons" id="getDataSelect">Select</button>
+        </div>
+        <div id="scanReceiptDiv" style="position:absolute; left:400px; top:690px; border:none;">
+                <label for="scanReceipt" style="margin: .9em 0 0 .5em; font-size: 1.1em;">Scan Receipt Number:</label>
+                <input type="text" id="scanReceipt" style="width: 200px; margin: 1.1em .5em 0 1em; font-size: 1.2em;" />
+        </div>
+    </form>
+
+    <!-- List Items -->
+    <div id="getHistory" style="display:none;">
+        <div style="border:none;">
+            <img id='exitHistory' src="Images/round-exit.png" alt="Exit" style="float:right; clear:right; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div id="getHistoryMessage" style="text-align:center; margin:1em 0 1em 0; font-family:Arial; font-size: 18px; font-weight: bold; border:none !important; color:black">
+            Message!
+        </div>
+        <div id="getHistoryGrid"></div>
+        <div style="border:none; margin-top:3em;">
+            <button type="button" class="fbuttons" id="doneHistory" style="position:absolute; top:680px; left:5em; background-color:#1d98ec; color:white;" >Selected Picked Up</button>
+        </div>
+
+    </div>
+
+    <!-- Message Box (replaces alert) -->
+    <div id="msgBox" style="display:none;"></div>
+    <div id="_msgBox" style="display:none;">
+        <div style="text-align:center; margin-top:1em; border:none !important;">
+            <span id="msgText" style="font-size:1.5em; font-weight:bold;">Message!</span>
+        </div>
+        <div id="btnCenter" style="text-align:center; border:none !important;">
+            <button type="button" id="btnMsgOK" style="position: absolute; top: 150px; left: 170px; width: 60px; font-size:1.5em;">OK</button>
+        </div>
+    </div>
+
+    <!-- Constants and Variable -->
+    <script type="text/javascript">
+        var shortDays = [];
+        shortDays[0] = 'Sun';
+        shortDays[1] = 'Mon';
+        shortDays[2] = 'Tue';
+        shortDays[3] = 'Wed';
+        shortDays[4] = 'Thu';
+        shortDays[5] = 'Fri';
+        shortDays[6] = 'Sat';
+
+        var shortMonths = [];
+        shortMonths[0] = 'Jan';
+        shortMonths[1] = 'Feb';
+        shortMonths[2] = 'Mar';
+        shortMonths[3] = 'Apr';
+        shortMonths[4] = 'May';
+        shortMonths[5] = 'Jun';
+        shortMonths[6] = 'Jul';
+        shortMonths[7] = 'Aug';
+        shortMonths[8] = 'Sep';
+        shortMonths[9] = 'Oct';
+        shortMonths[10] = 'Nov';
+        shortMonths[11] = 'Dec';
+
+        var grid2;
+        var data2 = [];
+
+        var gridHistory;
+        var dataHistory = [];
+
+        var columns2 = [
+        { id: "orderdate", name: "Date", field: "orderdate", width: 179, resizable: false },
+        { id: "ordernote", name: "Note", field: "ordernote", width: 200, resizable: false },
+        { id: "orderguid", name: "Order", field: "orderguid", width: 300, resizable: false },
+        { id: "custname", name: "Customer", field: "custname", width: 200, resizable: false }
+        ];
+
+        var columnsHistory = [
+        { id: "historyDate", name: "Date", field: "historyDate", width: 119, resizable: false },
+        { id: "historyStore", name: "Store", field: "historyStore", width: 120, resizable: false },
+        { id: "historySupplier", name: "Brand", field: "historySupplier", width: 50, resizable: false },
+        { id: "historyStyle", name: "Style", field: "historyStyle", width: 100, resizable: false },
+        { id: "historyColor", name: "Color", field: "historyColor", width: 70, resizable: false },
+        { id: "historySize", name: "Size", field: "historySize", width: 100, resizable: false },
+        { id: "historyVariance", name: "Other", field: "historyVariance", width: 50, resizable: false },
+        { id: "historyDescription", name: "Description", field: "historyDescription", width: 230, resizable: false },
+        { id: "historyQuantity", name: "Qty", field: "historyQuantity", width: 40, resizable: false }
+        ]
+
+        var options2 = {
+            editable: false,
+            autoEdit: false,
+
+            enableAddRow: false,
+            enableCellNavigation: true,
+            multiSelect: false,
+            enableColumnReorder: false,
+            asyncEditorLoading: false
+        }
+
+        var optionsHistory = {
+            editable: false,
+            autoEdit: false,
+
+            enableAddRow: false,
+            enableCellNavigation: true,
+            multiSelect: true,
+            enableColumnReorder: false,
+            asyncEditorLoading: false
+        }
+
+        // examine keyboard keys when not in an editor
+        var blockedKeysArr = [
+            // allow tab (7), caps lock (20), page up (33), page down (34), end (35)
+            8,  // backspace - will go back a url
+            //13, // enter
+            18, // alt
+            19, // pause, break
+            27, // escape
+            36, // home
+            45, // insert
+            // function keys 1 (112) - 12 (123)
+            112, 113, 114, 115,
+            116, // F5
+            117, 118, 119, 120, 121,
+            122, // F11
+            123];
+    </script>
+        <!-- Startup (ready) functionp -->
+    <script type="text/javascript">
+        $(function () {
+            Date.format = 'mm/dd/yyyy';
+            $('.date-pick').datePicker().val(new Date().asString()).trigger('change');
+
+            grid2 = new Slick.Grid("#getDataGrid", data2, columns2, options2);
+            grid2.setSelectionModel(new Slick.RowSelectionModel());
+
+            gridHistory = new Slick.Grid('#getHistoryGrid', dataHistory, columnsHistory, optionsHistory);
+            gridHistory.setSelectionModel(new Slick.RowSelectionModel());
+
+            var dtVar = Math.round(Math.random() * 10);
+            var mDate = new Date();
+            mDate.setDate(mDate.getDate() - dtVar);
+            var sDate = shortDays[mDate.getDay()] + ', ' + shortMonths[mDate.getMonth()] + ' ' + mDate.getDate() + ', ' + mDate.getFullYear();
+            for (var i = 0; i < 31; i++) {
+                var d2 = (data2[i] = {});
+                d2['orderdate'] = sDate;
+                d2['ordernote'] = 'Saved as: ' + i;
+                d2['orderguid'] = UUID.generate().toUpperCase().replace(/-/g, '');
+                d2['custname'] = 'Fred Jones';
+                d2['customer_id'] = UUID.generate().toUpperCase().replace(/-/g, '');
+            }
+            grid2.invalidate();
+            grid2.render();
+
+            grid2.onDblClick.subscribe(function (e, args) {
+                $('#getDataSelect').trigger('click');
+            });
+
+            gridHistory.onClick.subscribe(function (e, args) {
+                var selectedRow = args.row;
+                if (dataHistory.length <= 0 || selectedRow >= dataHistory.length) {
+                    return;
+                }
+                if (e.stopPropagation) e.stopPropagation();
+                if (e.preventDefault) e.preventDefault();
+                var selRows = [];
+                selRows = gridHistory.getSelectedRows();
+                var noMatch = true;
+                for (var i = 0; i < selRows.length; i++) {
+                    if (selRows[i] == selectedRow) {
+                        noMatch = false;
+                        break;
+                    }
+                }
+                setTimeout(function () {
+
+                    if (noMatch) {
+                        selRows.push(selectedRow);
+                        gridHistory.setSelectedRows(selRows);
+                    } else {
+                        var newRows = [];
+                        for (var i = 0; i < selRows.length; i++) {
+                            if (selRows[i] != selectedRow) {
+                                newRows.push(selRows[i]);
+                            }
+                        }
+                        gridHistory.setSelectedRows(newRows);
+                    }
+                },100)
+            });
+        });
+    </script>
+    <!-- Page-specific Utility Javascript -->
+    <script type="text/javascript">
+        // Keyboard
+        $('body').keydown(function (e) {
+            if (e.ctrlKey || e.altKey) { return false; };
+            if (e.target.type != "text") { return false; };
+
+            //adjust for keypad
+            if (e.which >= 96 && e.which <= 105) {
+                e.which -= 48;
+            }
+
+            if (e.which == 13) {
+                $('#btnSearch').focus();
+                return false;
+            }
+
+            //ignore TAB, CR, arrow down, page down, arrow up, page up, delete, backspace, end, home, left arrow, right arrow
+            if (e.which == 9 || e.which == 16 || e.which == 13 || e.which == 40 || e.which == 34 || e.which == 33 || e.which == 38 ||
+                e.which == 46 || e.which == 8 || e.which == 35 || e.which == 36 || e.which == 37 || e.which == 39)
+            {
+                return true;
+            }
+
+            if (e.target.type == 'text' && e.which == 27) {
+                // clear entry if text type input
+                e.target.value = '';
+                return false;
+            }
+
+            // review other codes to see if they should be blocked
+            for (var t = 0; t < blockedKeysArr.length; t++) {
+                if (e.which == blockedKeysArr[t]) {
+                    //alert("Key Code: " + window.event.keyCode + " This action is not allowed");
+                    if (e.which != 16 && e.which != 17) {
+                        window.event.keyCode = 503;
+                    }; //shift, control
+                    if (e.stopPropagation) e.stopPropagation();
+                    if (e.preventDefault) e.preventDefault();
+                    return false;
+                }
+            }
+            if (/^\d*$/.test(e.target.id) == true) {
+                if (e.which < 48 || e.which > 57) { return false };
+            }
+            return true;
+        });
+
+        // show and hide the message box
+        function showMsg(msg) {
+            $('#msgText').text(msg);
+            $('#msgBox').show();
+            $('#_msgBox').show();
+        };
+        $('#btnMsgOK').click(function () {
+            $('#_msgBox').hide();
+            $('#msgBox').hide();
+        });
+
+        // date picker helpers
+        $(function () {
+            $(".date-pick").datePicker({
+                //autoFocusNextInput: true,
+                startDate: '01/01/2010',
+                endDate: (new Date()).asString()
+            });
+
+            $('#fromDatepicker').bind('dpClosed',
+            function (e, selectedDates) {
+                var d = selectedDates[0];
+                if (d) {
+                    d = new Date(d);
+                    $('#toDatepicker').dpSetStartDate(d.asString());
+                    var d2 = new Date($('#toDatepicker').datePicker().val());
+                    if (d2 < d) {
+                        $('#toDatepicker').datePicker().val(d.asString()).trigger('change');
+                    }
+
+                }
+            });
+            $('#toDatepicker').bind('dpClosed',
+            function (e, selectedDates) {
+                var d = selectedDates[0];
+                if (d) {
+                    d = new Date(d);
+                    $('#fromDatepicker').dpSetEndDate(d.asString());
+                    var d2 = new Date($('#fromDatepicker').datePicker().val());
+                    if (d2 > d) {
+                        $('#fromDatepicker').datePicker().val(d.asString()).trigger('change');
+                    }
+                }
+            });
+        });
+        $(".date-pick").bind('click', function () {
+            $(this).trigger('change');
+            $(this).dpDisplay();
+        });
+
+        $('#scanReceipt').change(function () {
+            $('#btnSearch').trigger('click');
+        });
+
+        $('#btnSearch').click(function () {
+            var searchTerm = '';
+            if ($('#scanReceipt').val() != '') {
+                searchTerm = 'order:{"equal"' + $('#scanReceipt').val(); + '}';
+            } else {
+// use dates and location
+            }
+// more terms and ajax
+        });
+
+        $('#getDataSelect').click(function () {
+            var dataRow = grid2.getSelectedRows();
+            // fill in data
+            getItems(data2[dataRow[0]]['orderguid']);
+            data2.length = 0;
+            grid2.invalidate();
+            grid2.render();
+            $('#getData').hide();
+            $('#form1').show();
+        });
+
+        function getItems(orderguid) {
+            var dtVar = Math.round(Math.random() * 10);
+            var mDate = new Date();
+            mDate.setDate(mDate.getDate() - dtVar);
+            var dh = (dataHistory[0] = {});
+            var sDate = shortDays[mDate.getDay()] + ', ' + shortMonths[mDate.getMonth()] + ' ' + mDate.getDate() + ', ' + mDate.getFullYear();
+            dh['historyDate'] = sDate;
+            dh['historyStore'] = 'Sandy Springs';
+            dh['historySupplier'] = 'PSU';
+            dh['historyStyle'] = '7200';
+            dh['historyColor'] = 'KHA';
+            dh['historySize'] = '6XR';
+            dh['historyVariance'] = '';
+            dh['historyDescription'] = 'SLACKS, GIRLS, ELAS';
+            dh['historyQuantity'] = '2';
+
+            var dh = (dataHistory[1] = {});
+            dh['historyDate'] = sDate;
+            dh['historyStore'] = 'Sandy Springs';
+            dh['historySupplier'] = 'PSU';
+            dh['historyStyle'] = '6000';
+            dh['historyColor'] = 'NVY';
+            dh['historySize'] = 'YM';
+            dh['historyVariance'] = '';
+            dh['historyDescription'] = 'CARDIGAN, CREWNECK';
+            dh['historyQuantity'] = '1';
+
+            var dh = (dataHistory[2] = {});
+            dh['historyDate'] = sDate;
+            dh['historyStore'] = 'Sandy Springs';
+            dh['historySupplier'] = 'PSU';
+            dh['historyStyle'] = '6000';
+            dh['historyColor'] = 'BLK';
+            dh['historySize'] = 'YM';
+            dh['historyVariance'] = '';
+            dh['historyDescription'] = 'CARDIGAN, CREWNECK';
+            dh['historyQuantity'] = '2';
+
+            gridHistory.invalidate();
+            gridHistory.render();
+
+            $('#form1').hide();
+            $('#getHistoryMessage').text('Select Items Picked Up');
+            $('#getHistory').show();
+        };
+        $('#exitHistory, #doneHistory').click(function () {
+            $('#getHistory').hide();
+            $('#form1').show();
+        });
+        $('#doneHistory').click(function() {
+            var pickedUp = gridHistory.getSelectedRows();
+            if (pickedUp.length > 0) {
+                for (var i = 0; i < pickedUp.length; i++) {
+// flag db as picked up
+                }
+            }
+
+            history.go(-1);
+        });
+    </script>
+</body>
+</html>

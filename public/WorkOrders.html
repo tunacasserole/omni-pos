@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    </title>
+    <script type="text/javascript" src="Scripts/jquery-1.8.1.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.23.custom.min.js"></script>
+    <style type="text/css">
+         body {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 900px;
+            height: 700px;
+            background-color: rgba(247, 248, 167, 1.0);
+            margin: 0 0 0 0;
+            border: none !important;
+            z-index: 2000;
+        }
+         #msgBox {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            border: none;
+            width: 1020px;
+            height: 764px;
+            /*background: white transparent scroll repeat 0% 0%;*/
+            background: white;
+            opacity: 0.4;
+            filter:alpha(opacity=40);
+            pointer-events:visible;
+            z-index: 9997;
+        }
+        #_msgBox {
+            position: absolute;
+            top: 270px;
+            left: 310px;
+            width: 400px;
+            height: 200px;
+            background-color: rgba(255, 168, 64, 1.0) !important;
+            color: white !important;
+            border: 3px solid white !important;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            z-index: 9998;
+        }
+    </style>
+    <script type="text/javascript">
+        function init() {
+            self.moveTo(0, 0);
+            self.resizeTo(1024, 768);
+
+            $('body').bind("contextmenu", function (e) {
+                e.preventDefault();
+            });
+        }
+    </script>
+</head>
+<body onload="init()">
+    <form id="form1" action="javascript:void(0);">
+    <div>
+        <div style="margin: 0; padding 0; border:none;">
+            <img id='exitGetData' onclick="javascript: history.go(-1)" src="Images/round-exit.png" alt="Exit" style="position:absolute; left:960px; top:0px; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+    </div>
+    </form>
+
+    <!-- Message Box (replaces alert) -->
+    <div id="msgBox" style="display:none;"></div>
+    <div id="_msgBox" style="display:none;">
+        <div style="text-align:center; margin-top:1em; border:none !important;">
+            <span id="msgText" style="font-size:1.5em; font-weight:bold;">Message!</span>
+        </div>
+        <div id="btnCenter" style="text-align:center; border:none !important;">
+            <button type="button" id="btnMsgOK" style="position: absolute; top: 150px; left: 170px; width: 60px; font-size:1.5em;">OK</button>
+        </div>
+    </div>
+    <script type="text/javascript">
+        // Keyboard
+        $('body').keydown(function (e) {
+            if (e.ctrlKey || e.altKey) { return false; };
+            if (e.target.type != "text") { return false; };
+
+            //adjust for keypad
+            if (e.which >= 96 && e.which <= 105) {
+                e.which -= 48;
+            }
+            //ignore TAB
+            if (e.which == 9 || e.which == 16) {
+                return true;
+            }
+
+            //adjust for CR or arrow down or page down
+            if (e.which == 13 || e.which == 40 || e.which == 34) {
+                var x = document.getElementsByTagName("input");
+                for (var i = 0; i < x.length; i++) {
+                    if (e.target.id == x[i].id && i < x.length - 1) {
+                        if (/^\d*$/.test(x[i + 1].id) == true || x[i + 1].className == 'noncash') {
+                            if (x[i + 1].type == "text") {
+                                $('#' + x[i + 1].id).focus();
+                                break;
+                            }
+                        }
+                    }
+                    if (e.target.id == x[i].id && /^\d*$/.test(x[i + 1].id) == false) {
+                        $('#0').focus();
+                        break;
+                    }
+                }
+                return false;
+            }
+
+            //adjust for arrow up or page up
+            if (e.which == 33 || e.which == 38) {
+                var x = document.getElementsByTagName("input");
+                for (var i = 0; i < x.length; i++) {
+                    if (e.target.id == x[i].id && i < x.length) {
+                        if (i >= 1 && x[i - 1].type == "text") {
+                            $('#' + x[i - 1].id).focus();
+                            break;
+                        } else { break; }
+                    }
+                }
+                return false;
+            }
+
+            //test for delete key
+            if (e.which == 46) {
+                // pass the delete through
+                return true;
+            }
+            else if (e.target.type == 'text' && (e.which == 8 || e.which == 35 || e.which == 36 || e.which == 37 || e.which == 39)) {
+                // pass backspace, end, home, left and right arrows to form if text type input
+                return true;
+            }
+            else if (e.target.type == 'text' && e.which == 27) {
+                // clear entry if text type input
+                e.target.value = '';
+                return false;
+            }
+            else {
+                // review other codes to see if they should be blocked
+                for (var t = 0; t < blockedKeysArr.length; t++) {
+                    if (e.which == blockedKeysArr[t]) {
+                        //alert("Key Code: " + window.event.keyCode + " This action is not allowed");
+                        if (e.which != 16 && e.which != 17) {
+                            window.event.keyCode = 503;
+                        }; //shift, control
+                        if (e.stopPropagation) e.stopPropagation();
+                        if (e.preventDefault) e.preventDefault();
+                        return false;
+                    }
+                }
+                if (/^\d*$/.test(e.target.id) == true) {
+                    if (e.which < 48 || e.which > 57) { return false };
+                }
+                return true;
+            }
+        });
+
+        // show and hide the message box
+        function showMsg(msg) {
+            $('#msgText').text(msg);
+            $('#msgBox').show();
+            $('#_msgBox').show();
+        };
+        $('#btnMsgOK').click(function () {
+            $('#_msgBox').hide();
+            $('#msgBox').hide();
+        });
+
+    </script>
+</body>
+</html>

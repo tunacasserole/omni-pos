@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+    <title>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    </title>
+    <script type="text/javascript" src="Scripts/jquery-1.8.1.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.23.custom.min.js"></script>
+    <style type="text/css">
+        body {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 900px;
+            height: 700px;
+            background-color: rgba(60, 179, 113, 1.0) !important;
+            z-index: 2001;
+            margin: 0 0 0 0;
+            border: none !important;
+        }
+        #_msgBox {
+            font-size:1.4em !important;
+            font-weight: bold;
+            position:absolute;
+            top: 350px;
+            left: 300px;
+            width: 424px;
+            height: 130px;
+            background-color: rgba(140, 191, 38, 1.0);
+            color:white;
+            border: 3px solid white;
+            -moz-border-radius:10px;
+            border-radius:10px;
+        }
+    </style>
+    <script type="text/javascript">
+        function init() {
+            window.returnValue = 'Print';
+            $('#msgText').text(window.dialogArguments);
+            self.moveTo(0, 0);
+            self.resizeTo(1024, 768);
+
+            $('body').bind("contextmenu", function (e) {
+                e.preventDefault();
+            });
+        }
+    </script>
+</head>
+<body onload="init()">
+    <form id="form1" runat="server">
+        <div id="_msgBox">
+            <div style="text-align:center; margin-top:.5em; border:none !important;">
+                <span id="msgText">Email the Receipt, Print the Receipt or Both?</span>
+            </div>
+            
+            <div id="btnEPB" style="border:none !important">
+                <button type="button" id="btnEmail" style="float:left; clear:left; margin-left:1em; margin-top:2em;">Email Only</button>
+                <button type="button" id="btnReceipt" style="flex-align:center; margin:2em 2em 0 2em;">Print Receipt Only</button>
+                <button type="button" id="btnBoth" style="float:right; clear:right; margin-right:1em; margin-top:2em;">Both</button>
+            </div>
+        </div>
+    </form>
+    <script type="text/javascript">
+        $('#btnEmail').click(function () {
+            window.returnValue = 'Email';
+            self.close();
+        });
+
+        $('#btnReceipt').click(function () {
+            window.returnValue = 'Print';
+            self.close();
+        });
+
+        $('#btnBoth').click(function () {
+            window.returnValue = 'Both';
+            self.close();
+        });
+    </script>
+</body>
+</html>

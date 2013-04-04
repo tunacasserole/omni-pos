@@ -1,0 +1,1488 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Tender
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    </title>
+
+    <script type="text/javascript" src="Scripts/jquery-1.8.1.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.23.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/POS.custom.js"></script>
+    
+    <style type="text/css">
+    body
+   	{
+	    margin: 0; /* margin and padding only necessary to cater for Mac IE5 */
+	    padding: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100% /*990px*/;
+        height: 100% /*819px*/;
+        border: none;
+        background-color: rgba(247, 248, 167, 1.0) !important;
+ 	    /*\*/	overflow: hidden; /* because Mac IE5 doesn't understand */
+        -moz-border-radius:10px;
+        border-radius:10px;
+	}
+    div {
+        height: 1.6em;
+    }
+    label {
+        width:140px;
+        float:left;
+        clear:left;
+        padding-left: 2em;
+    }
+    .tender {
+        width: 160px;
+        text-align: right;
+        float:right;
+        clear:right;
+        margin-right: 2em;
+    }
+    .ccard {
+        width: 160px;
+        text-align: right;
+        float:right;
+        clear:right; 
+        margin-right: 2em;
+    }
+    input:focus {
+        outline:none;
+        border-color:#ff9933;
+        box-shadow:0 0 5px #ff9933 /*inset*/;
+    }
+    #top {
+        position: absolute;
+        left: 315px !important;
+        top: 80px  !important;
+        width: 380px;
+        height: 12em;
+        border: 3px solid white;
+        background-color:#cbdaf0;
+        color:black;
+        -moz-border-radius:10px;
+        border-radius:10px;
+    }
+    #ProcessCreditCard {
+        position: absolute;
+        left: 315px !important;
+        top: 80px  !important;
+        width: 380px;
+        height: 27em;
+        border: 3px solid rgba(255, 255, 255, 1.0);
+        background-color:blue;
+        color:white;
+        -moz-border-radius:10px;
+        border-radius:10px;
+    }
+    #ProcessVoucher {
+        position: absolute;
+        left: 315px !important;
+        top: 180px  !important;
+        width: 380px;
+        height: 18em;
+        border: 3px solid rgba(255, 255, 255, 1.0);
+        background-color: lightskyblue;
+        color:white;
+        -moz-border-radius:10px;
+        border-radius:10px;
+    }
+    #AdditionalInfo {
+        position: absolute;
+        left: 315px !important;
+        top: 80px  !important;
+        width: 380px;
+        height: 34em;
+        border: 3px solid rgba(0, 0, 0, 1.0);
+        background-color:lightyellow;
+        color:black;
+        -moz-border-radius:10px;
+        border-radius:10px;
+    }
+    #cardType, #voucherType, #infoType {
+        font-family:Arial;
+        font-weight: bold;
+        margin-top:.5em;
+        text-align:center;
+    }
+    #msgBox {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        border: none;
+        width: 1020px;
+        height: 764px;
+        /*background: white transparent scroll repeat 0% 0%;*/
+        background: white;
+        opacity: 0.4;
+        filter:alpha(opacity=40);
+        pointer-events:visible;
+        z-index: 9997;
+        }
+    #_msgBox {
+        position: absolute;
+        top: 270px;
+        left: 310px;
+        width: 400px;
+        height: 200px;
+        background-color: rgba(255, 168, 64, 1.0) !important;
+        color: white !important;
+        border: 3px solid white !important;
+        -moz-border-radius: 10px;
+        border-radius: 10px;
+        z-index: 9998;
+    }
+    </style>
+
+    <!-- Constants, Variables -->
+    <script type="text/javascript">
+        // examine keyboard keys when not in an editor
+        var blockedKeysArr = [
+            // allow tab (7), caps lock (20), page up (33), page down (34), end (35)
+            8,  // backspace - will go back a url
+            //13, // enter
+            18, // alt
+            19, // pause, break
+            27, // escape
+            36, // home
+            45, // insert
+            // function keys 1 (112) - 12 (123)
+            112, 113, 114, 115,
+            //116, // F5
+            117, 118, 119, 120, 121,
+            122, // F11
+            123];
+
+        // constants
+        id = 0;
+        tender_id = 1;
+        display = 2;
+        description = 3;
+        short_name = 4;
+        tender_type = 5;
+        is_allow_over_tendering = 6;
+        is_open_cash_drawer = 7;
+        is_required_signature = 8;
+        is_allow_multiple_entry = 9;
+        is_print_duplicate_receipt = 10;
+        is_allow_cash_back = 11;
+        maximum_tender_amount = 12;
+        display_order = 13;
+        is_verify_via_edc = 14;
+        cash_back_limit = 15;
+        cash_back_fee = 16;
+        gl_account_id = 17;
+        validation_mask = 18;
+        is_credit_card = 19;
+        is_required_account_holder = 20;
+        is_required_account_nbr = 21;
+        is_required_expiration_date = 22;
+        is_required_ccv_code = 23;
+        is_required_postal_code = 24;
+        is_required_serial_nbr = 25;
+        is_required_routing_nbr = 26;
+        is_required_state = 27;
+        is_required_license_nbr = 28;
+        is_required_birth_date = 29;
+        is_required_avs_response = 30;
+        is_update_till = 31;
+        is_accept_business_credit_card = 32;
+
+        is_enabled_for_web = 33;
+        is_enabled_for_pos = 34;
+        is_enabled_for_phone = 35;
+
+        oId = 0;
+        oIs_credit_card = 1;
+        oTenderid = 2;
+        oAmount = 3;
+        oApproval_code = 4;
+        oToken = 5;
+        oGl_account_id = 6;
+        oAccount_holder = 7;
+        oAccount_nbr = 8;
+        oExpiration_date = 9;
+        oCcv_code = 10;
+        oPostal_code = 11;
+        oSerial_nbr = 12;
+        oRouting_nbr = 13;
+        oState = 14;
+        oLicense_nbr = 15;
+        oBirth_date = 16;
+        oDisplay = 17;
+
+
+        // variables
+        var phoneOrder = false;
+        var cnt = 0;
+        var Paid = 0;
+        var Total = 0;
+        var InitialAmount = 0;
+        var wRet = [];
+        var PaymentInstruments = [];
+        var tenderAttributes = [];
+        var ccCnt = 0;
+        var CurrentCreditCard = {};
+        var CurrentVoucher = {};
+        var CurrentTender = {};
+        var thisTender = -1;
+        var approvalCode = '';
+        var tokenValue = '';
+        var tenderDetails = [];
+
+        var items = [];
+        var itemTable = [];
+    </script>
+    <!-- Initialization -->
+    <script type="text/javascript">
+        $(function () {
+            self.moveTo(10, 10);
+            self.resizeTo(990, 819);
+
+            $('body').bind("contextmenu", function (e) {
+                e.preventDefault();
+            });
+
+            wRet.Amount = 0;
+            wRet.Payment = [];
+            wRet.Details = [];
+            wRet.Change = 0;
+            wRet.OK = true;
+            window.returnValue = wRet;
+            var request = "http://horizon.buildit.io/api"
+            request = request + ',HTTP_X_API_TOKEN: Az12By34Cx'
+
+            var params = window.dialogArguments;
+            Total = parseFloat(params.Amount.replace(",", ""));
+            phoneOrder = params.phoneOrder;
+            InitialAmount = Total;
+
+            // initial setup
+            if (phoneOrder == 'true') {
+                $('#o0').hide();
+                $('#o1').hide();
+                cnt = 4;
+            } else {
+                cnt = 6;
+            }
+            for (var i = 0; i < 6; i++) {
+                tenderDetails[i] = new Array();
+                tenderDetails[i][oId] = i;
+                tenderDetails[i][oIs_credit_card] = false;
+                tenderDetails[i][oTenderid] = -1;
+                tenderDetails[i][oAmount] = 0;
+                tenderDetails[i][oApproval_code] = '';
+                tenderDetails[i][oToken] = '';
+                tenderDetails[i][oGl_account_id] = '';
+                tenderDetails[i][oAccount_holder] = '';
+                tenderDetails[i][oAccount_nbr] = '';
+                tenderDetails[i][oExpiration_date] = '';
+                tenderDetails[i][oCcv_code] = '';
+                tenderDetails[i][oPostal_code] = '';
+                tenderDetails[i][oSerial_nbr] = '';
+                tenderDetails[i][oRouting_nbr] = '';
+                tenderDetails[i][oState] = '';
+                tenderDetails[i][oLicense_nbr] = '';
+                tenderDetails[i][oBirth_date] = '';
+                tenderDetails[i][oDisplay] = '';
+            };
+
+            if (!getTenderData()) {
+                var displayCount = 0;
+
+                tenderAttributes[displayCount] = new Array();
+                tenderAttributes[displayCount][display] = 'Cash';
+                tenderAttributes[displayCount][is_allow_multiple_entry] = false;
+                tenderAttributes[displayCount][is_required_postal_code] = false;
+                tenderAttributes[displayCount][is_required_ccv_code] = false;
+                tenderAttributes[displayCount][is_credit_card] = false;
+                tenderAttributes[displayCount][is_allow_cash_back] = true;
+                tenderAttributes[displayCount][cash_back_limit] = 100;
+                displayCount += 1;
+
+                tenderAttributes[displayCount] = new Array();
+                tenderAttributes[displayCount][display] = 'Check';
+                tenderAttributes[displayCount][is_allow_multiple_entry] = false;
+                tenderAttributes[displayCount][is_required_postal_code] = false;
+                tenderAttributes[displayCount][is_required_ccv_code] = false;
+                tenderAttributes[displayCount][is_required_serial_nbr] = true;
+                tenderAttributes[displayCount][is_required_license_nbr] = true;
+                tenderAttributes[displayCount][is_allow_cash_back] = false;
+                tenderAttributes[displayCount][is_credit_card] = false;
+                tenderAttributes[displayCount][cash_back_limit] = 100;
+                displayCount += 1;
+
+                tenderAttributes[displayCount] = new Array();
+                tenderAttributes[displayCount][display] = 'Credit Card';
+                tenderAttributes[displayCount][is_allow_multiple_entry] = true;
+                tenderAttributes[displayCount][is_required_postal_code] = false;
+                tenderAttributes[displayCount][is_required_ccv_code] = false;
+                tenderAttributes[displayCount][is_credit_card] = true;
+                tenderAttributes[displayCount][cash_back_limit] = 100;
+                displayCount += 1;
+
+                tenderAttributes[displayCount] = new Array();
+                tenderAttributes[displayCount][display] = 'Gift Card';
+                tenderAttributes[displayCount][is_allow_multiple_entry] = true;
+                tenderAttributes[displayCount][is_required_postal_code] = false;
+                tenderAttributes[displayCount][is_required_ccv_code] = false;
+                tenderAttributes[displayCount][is_credit_card] = false;
+                tenderAttributes[displayCount][cash_back_limit] = 100;
+                displayCount += 1;
+
+                tenderAttributes[displayCount] = new Array();
+                tenderAttributes[displayCount][display] = 'Gift Certificate';
+                tenderAttributes[displayCount][is_allow_multiple_entry] = true;
+                tenderAttributes[displayCount][is_required_postal_code] = false;
+                tenderAttributes[displayCount][is_required_ccv_code] = false;
+                tenderAttributes[displayCount][is_credit_card] = false;
+                tenderAttributes[displayCount][cash_back_limit] = 100;
+                displayCount += 1;
+
+                tenderAttributes[displayCount] = new Array();
+                tenderAttributes[displayCount][display] = 'Bulk Sale';
+                tenderAttributes[displayCount][is_allow_multiple_entry] = false;
+                tenderAttributes[displayCount][is_required_postal_code] = false;
+                tenderAttributes[displayCount][is_required_ccv_code] = false;
+                tenderAttributes[displayCount][is_required_signature] = true;
+                tenderAttributes[displayCount][is_credit_card] = false;
+                tenderAttributes[displayCount][cash_back_limit] = 100;
+                displayCount += 1;
+
+                tenderAttributes[displayCount] = new Array();
+                tenderAttributes[displayCount][display] = 'American Express';
+                tenderAttributes[displayCount][is_allow_multiple_entry] = true;
+                tenderAttributes[displayCount][is_required_postal_code] = false;
+                tenderAttributes[displayCount][is_required_ccv_code] = false;
+                tenderAttributes[displayCount][is_credit_card] = true;
+                tenderAttributes[displayCount][cash_back_limit] = 100;
+                displayCount += 1;
+
+                tenderAttributes[displayCount] = new Array();
+                tenderAttributes[displayCount][display] = 'Visa';
+                tenderAttributes[displayCount][is_allow_multiple_entry] = true;
+                tenderAttributes[displayCount][is_required_postal_code] = true;
+                tenderAttributes[displayCount][is_required_ccv_code] = false;
+                tenderAttributes[displayCount][is_credit_card] = true;
+                tenderAttributes[displayCount][cash_back_limit] = 100;
+                displayCount += 1;
+
+                tenderAttributes[displayCount] = new Array();
+                tenderAttributes[displayCount][display] = 'MasterCard';
+                tenderAttributes[displayCount][is_allow_multiple_entry] = true;
+                tenderAttributes[displayCount][is_required_postal_code] = false;
+                tenderAttributes[displayCount][is_required_ccv_code] = true;
+                tenderAttributes[displayCount][is_credit_card] = true;
+                tenderAttributes[displayCount][cash_back_limit] = 100;
+                displayCount += 1;
+
+                tenderAttributes[displayCount] = new Array();
+                tenderAttributes[displayCount][display] = 'Discover';
+                tenderAttributes[displayCount][is_allow_multiple_entry] = true;
+                tenderAttributes[displayCount][is_required_postal_code] = true;
+                tenderAttributes[displayCount][is_required_ccv_code] = true;
+                tenderAttributes[displayCount][is_credit_card] = true;
+                tenderAttributes[displayCount][cash_back_limit] = 100;
+                displayCount += 1;
+            };
+
+            $('#oChange').hide();
+            $('#top').css('height', (Math.max(7, cnt + 5)) * $("#oChange").height());
+
+            // Amount entered
+            $('input').bind('change', testInput);
+            $('#total').text(Total.formatMoney(2));
+        });
+        </script>
+    <!-- Page-specific functions -->
+    <script type="text/javascript">
+        function getTenderData() {
+            return false;
+
+            var invocation = new XMLHttpRequest();
+            if (invocation) {
+                $('#waiting').show();
+                var urlModified = "http://horizon-buildit.herokuapp.com/api/" + 'tender' + "?page=1&page_size=100";
+                invocation.open('GET', urlModified, true);
+                invocation.setRequestHeader("X-API-TOKEN", token);
+                invocation.onreadystatechange = handleTableData;
+                invocation.send();
+            }
+            else {
+                showMsg('No Invocation TookPlace At All.');
+                return false;
+            }
+
+            function handleTableData(evtXHR) {
+                if (invocation.readyState == 4) {
+                    if (invocation.status == 200) {
+                        var json = $.parseJSON(invocation.responseText)
+                        var color_size_ok = true;
+                        $.each(json, function (i, item) {
+                            tenderAttributes[i] = new Array();
+                            $.each(item, function (k, v) {
+                                tenderAttributes[i][id] = i;
+                                if (k == 'tender_id') tenderAttributes[i][tender_id] = v;
+                                if (k == 'display') tenderAttributes[i][display] = v;
+                                if (k == 'description') tenderAttributes[i][description] = v;
+                                if (k == 'short_name') tenderAttributes[i][short_name] = v;
+                                if (k == 'tender_type') tenderAttributes[i][tender_type] = v;
+                                if (k == 'is_allow_over_tendering') tenderAttributes[i][is_allow_over_tendering] = v;
+                                if (k == 'is_open_cash_drawer') tenderAttributes[i][is_open_cash_drawer] = v;
+                                if (k == 'is_required_signature') tenderAttributes[i][is_required_signature] = v;
+                                if (k == 'is_allow_multiple_entry') tenderAttributes[i][is_allow_multiple_entry] = v;
+                                if (k == 'is_print_duplicate_receipt') tenderAttributes[i][is_print_duplicate_receipt] = v;
+                                if (k == 'is_allow_cash_back') tenderAttributes[i][is_allow_cash_back] = v;
+                                if (k == 'maximum_tender_amount') tenderAttributes[i][maximum_tender_amount] = v;
+                                if (k == 'display_order') tenderAttributes[i][display_order] = v;
+                                if (k == 'is_verify_via_edc') tenderAttributes[i][is_verify_via_edc] = v;
+                                if (k == 'cash_back_limit') tenderAttributes[i][cash_back_limit] = v;
+                                if (k == 'cash_back_fee') tenderAttributes[i][cash_back_fee] = v;
+                                if (k == 'gl_account_id') tenderAttributes[i][gl_account_id] = v;
+                                if (k == 'validation_mask') tenderAttributes[i][validation_mask] = v;
+                                if (k == 'is_credit_card') tenderAttributes[i][is_credit_card] = v;
+                                if (k == 'is_required_account_holder') tenderAttributes[i][is_required_account_holder] = v;
+                                if (k == 'is_required_account_nbr') tenderAttributes[i][is_required_account_nbr] = v;
+                                if (k == 'is_required_expiration_date') tenderAttributes[i][is_required_expiration_date] = v;
+                                if (k == 'is_required_ccv_code') tenderAttributes[i][is_required_ccv_code] = v;
+                                if (k == 'is_required_postal_code') tenderAttributes[i][is_required_postal_code] = v;
+                                if (k == 'is_required_serial_nbr') tenderAttributes[i][is_required_serial_nbr] = v;
+                                if (k == 'is_required_routing_nbr') tenderAttributes[i][is_required_routing_nbr] = v;
+                                if (k == 'is_required_state') tenderAttributes[i][is_required_state] = v;
+                                if (k == 'is_required_license_nbr') tenderAttributes[i][is_required_license_nbr] = v;
+                                if (k == 'is_required_birth_date') tenderAttributes[i][is_required_birth_date] = v;
+                                if (k == 'is_required_avs_response') tenderAttributes[i][is_required_avs_response] = v;
+                                if (k == 'is_update_till') tenderAttributes[i][is_update_till] = v;
+                                if (k == 'is_accept_business_credit_card') tenderAttributes[i][is_accept_business_credit_card] = v;
+                            })
+                        });
+                        return true;
+                    } else if (invocation.status == 500) {
+                        showMsg('Internal Server Error.');
+                        return false;
+                    } else if (invocation.status == 503) {
+                        showMsg('Sevice Unavailable.');
+                        return false;
+                    } else {
+                        showMsg('Invocation Errors Occured; Status: ' + invocation.status);
+                        return false;
+                    }
+                }
+                $('#waiting').hide();
+            };
+        };
+    </script>
+</head>
+<body style="background-color:#cbdaf0">
+    <form id="formN" action="javascript:void(0);">
+        <div id="top";>
+            <div id ="payment" style="text-align:center; font-family:Arial; font-size:1.2em; font-weight: bold; padding-top:.5em;">Payment</div>
+            <div id="paycolumns" style="font-family:Arial;">
+                <div>
+                    <span id="tendertype" style="font-weight:bold; padding-left:1em;">Tender Type</span>
+                    <span id="inputs" style="font-weight:bold; float:right; padding-right:5em;">Amount</span>
+                </div>
+            </div>
+            <div class="tendertypes">
+                <div id="o0"><label id="l0">Cash:</label><input type="text" id="0" class="tender tenderType"  /></div>
+                <div id="o1"><label id="l1">Check:</label><input type="text" id="1" class="tender tenderType" /></div>
+                <div id="o2"><label id="l2">Credit Card:</label><input type="text" id="2" class="ccard phoneOrder tenderType" /></div>
+                <div id="o3"><label id="l3">Gift Card:</label><input type="text" id="3" class="tender voucher phoneOrder tenderType" /></div>
+                <div id="o4"><label id="l4">Gift Certificate:</label><input type="text" id="4" class="tender phoneOrder tenderType" /></div>
+                <div id="o5"><label id="l5">Bulk Sale:</label><input type="text" id="5" class="tender phoneOrder tenderType" /></div>
+            </div>
+            <div style="display:none;" id="oChange"><label style="margin-top:.5em;">Change:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label><input style="margin-top:.5em;" type="text" id="Change" class="tender" readonly="readonly" /></div>
+            <div style="clear:both; border:none;"></div>
+            <div style="margin-top:1em;"><label id="total"></label><button type="button" id="tenderFinished">Finished</button></div>
+        </div>
+    </form>
+
+    <!-- Message Box (replaces alert) -->
+    <div id="msgBox" style="display:none;"></div>
+    <div id="_msgBox" style="display:none;">
+        <div style="text-align:center; margin-top:1em; border:none !important;">
+            <span id="msgText" style="font-size:1.5em; font-weight:bold;">Message!</span>
+        </div>
+        <div id="btnCenter" style="text-align:center; border:none !important;">
+            <button type="button" id="btnMsgOK" style="position: absolute; top: 150px; left: 170px; width: 60px; font-size:1.5em;">OK</button>
+        </div>
+    </div>
+
+    <!-- Credit Card Form -->
+    <div id="ProcessCreditCard" style="display:none">
+        <div><img id='exitProcessCreditCard' src="Images/round-exit.png" alt="Exit" style="float:right; clear:right; height:1.5em; width:1.5em; padding-right:0.5em; padding-top:0.5em;" /></div>
+        <div id="cardType" style="margin-top:1em;"></div>
+        <div id="amtdiv" style="margin-top:1em; float:left; clear:left;">
+            <label id="lca" for="chgamt">Amount:</label>
+            <input type="text" id="chgamt" readonly="readonly" style="color:gray; text-align: right" />
+        </div>
+        <div id="ccdiv" style="margin-top:1em; float:left; clear:left;">
+            <label id="lcc" for="card">Credit Card:</label>
+            <input type="text" id="card" />
+        </div>
+        <div id="expdiv" style="margin-top:1em; float:left; clear:left;">
+            <label id="lex" for="expiry">Expiration Date: (yymm)</label>
+            <input type="text" id="expiry" />
+        </div>
+        <div id="namediv" style="margin-top:1em; float:left; clear:left;">
+            <label id="lnm" for="name">Name:</label>
+            <input type="text" id="name" />
+        </div>
+        <div id="zipdiv" style="display: none; margin-top:1.5em; float:left; clear:left;">
+            <label id="lzip" style="color:yellow" for="zip">ZIP Code:</label>
+            <input type="text" id="zip" />
+        </div>
+        <div id="ccvdiv" style="display: none; margin-top:1.5em; float:left; clear:left;">
+            <label id="lccv" style="color:yellow" for="ccv">CCV:</label>
+            <input type="text" id="ccv" />
+        </div>
+        <div id="authdiv" style="margin-top:1em; float:left; clear:left;">
+            <label id= "lva" for="authorization">Voice Authorization:</label>
+            <input type="text" id="authorization" />
+        </div>
+        <div style="clear:both; border:none;"></div>
+        <div>
+            <button type="button" id="btnCreditCardDone" style="margin-left:10em;">Process</button>
+        </div>
+    </div>
+
+    <!-- Voucher -->
+    <div id="ProcessVoucher" style="display:none">
+    <div><img id='exitVoucher' src="Images/round-exit.png" alt="Exit" style="float:right; clear:right; height:1.5em; width:1.5em; padding-right:0.5em; padding-top:0.5em;" /></div>
+    <div id="voucherType" style="margin-top:1em;"></div>
+    <div id="vamtdiv" style="margin-top:1em; float:left; clear:left;">
+        <label for="vchgamt">Amount:</label>
+        <input type="text" id="vchgamt" readonly="readonly" style="color:gray; text-align: right" />
+    </div>
+    <div id="vscandiv" style="margin-top:1em; float:left; clear:left;">
+        <label for="gcard">Gift Card Number:</label>
+        <input type="text" id="gcard" />
+    </div>
+    <div id="vavaildiv" style="margin-top:2em; float:left; clear:left;">
+        <label for="vavailable">Amount Available:</label>
+        <input type="text" id="vavailable" />
+    </div>
+    <div style="clear:both; border:none;"></div>
+    <div>
+        <button type="button" id="btnVoucherDone" style="margin-left:10em;">Apply</button>
+    </div>
+</div>
+
+    <!-- Check or Other Required Info Form -->
+    <div id="AdditionalInfo" style="display:none">
+        <div><img id='exitAdditional' src="Images/round-exit.png" alt="Exit" style="float:right; clear:right; height:1.5em; width:1.5em; padding-right:0.5em; padding-top:0.5em;" /></div>
+        <div id="infoType" style="margin-top:1em;"></div>
+        <div id="ahdiv" style="margin-top:1em; float:left; clear:left; display:none;">
+            <label for="accountholder" id="lah">Account Holder:</label>
+            <input type="text" id="accountholder" />
+        </div>
+        <div id="sndiv" style="margin-top:1em; float:left; clear:left; display:none;">
+            <label for="serialnumber" id="lsn">Check Number:</label>
+            <input type="text" id="serialnumber" />
+        </div>
+        <div id="rndiv" style="margin-top:1em; float:left; clear:left; display:none;">
+            <label for="routingnumber" id="lrn">Routing Number:</label>
+            <input type="text" id="routingnumber" />
+        </div>
+        <div id="stdiv" style="margin-top:1em; float:left; clear:left; display:none;">
+            <label for="idstate" id="lst">State:</label>
+            <input type="text" id="idstate" />
+        </div>
+        <div id="lndiv" style="margin-top:1em; float:left; clear:left; display:none;">
+            <label for="licensenumber" id="lln">License Number:</label>
+            <input type="text" id="licensenumber" />
+        </div>
+        <div id="bddiv" style="margin-top:1em; float:left; clear:left; display:none;">
+            <label for="birthdate" id="lbd">Birth Date:</label>
+            <input type="text" id="birthdate" />
+        </div>
+        <div style="clear:both; border:none;"></div>
+        <div id="addDone">
+            <button type="button" id="btnAddDone" style="margin-left:1em;">Done</button>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // Finished button
+        $('#tenderFinished').click(function () {
+            if (Total != 0) {
+                return;
+            } else {
+                ccCnt = 0;
+                Paid = 0;
+                for (var i = 0; i < tenderDetails.length; i++) {
+                    var adj = tenderDetails[i][oAmount];
+                    if (adj != 0) {
+                        if (tenderDetails[i][oIs_credit_card] == true) {
+                            PaymentInstruments[ccCnt] = tenderDetails[i][oDisplay] + ', XXXX' + tenderDetails[i][oAccount_nbr] + ' - ' + adj
+                        } else if (tenderDetails[i][oAccount_nbr] != '') {
+                            PaymentInstruments[ccCnt] = tenderDetails[i][oDisplay] + ', ' + tenderDetails[i][oAccount_nbr] + ' - ' + adj
+                        } else {
+                            PaymentInstruments[ccCnt] = tenderDetails[i][oDisplay] + ' - ' + adj
+                        }
+                        ccCnt += 1;
+                        Paid += adj;
+                    }
+                }
+
+                if ($('#oChange').is(":visible") == true) {
+                   PaymentInstruments[ccCnt] = 'Change, ' + $('#Change').val();
+                   Paid -= $('#Change').val();
+                };
+            }
+            wRet.Amount = Paid.formatMoney(2, '');
+            wRet.Payment = PaymentInstruments;
+            wRet.Details = tenderDetails;
+            wRet.OK = true;
+            window.returnValue = wRet;
+            self.close();
+        });
+
+        // show and hide the message box
+        function showMsg(msg) {
+            $('#msgText').text(msg);
+            $('#msgBox').show();
+            $('#_msgBox').show();
+        };
+        $('#btnMsgOK').click(function () {
+            $('#_msgBox').hide();
+            $('#msgBox').hide();
+            $('#form1').show();
+        });
+
+        // Credit Card Entry validations
+        $('#card').bind('change', function () {
+            if ($('#card').val() == '') { return }
+            var altMsg = false;
+            var ccSwipe = $('#card').val();
+            if (ccSwipe.length > 16) {
+                if (ccSwipe.substr(0, 2) == '%B') {
+                    var endofCC = ccSwipe.indexOf('^');
+                    if (endofCC > 0) {
+                        var endofName = ccSwipe.indexOf('^', endofCC + 1);
+                        var beginTrack2 = ccSwipe.indexOf('?');
+                        var endofT2CC = ccSwipe.indexOf('=');
+                        var cc1 = ccSwipe.slice(2, endofCC);
+                        var cc2 = ccSwipe.slice(beginTrack2 + 2, endofT2CC)
+                        if (cc1 == cc2) {
+                            $('#card').val(cc1);
+                            $('#name').val($.trim(ccSwipe.slice(endofCC+1,endofName)));
+                            $('#expiry').val(ccSwipe.slice(endofName+1,endofName+5));
+                        } else {
+                            altMsg = true;
+                            showMsg('Credit Card Read Error - Try again.');
+                            $('#card').val('');
+                            $('#card').focus();
+                        }
+                    }
+                }
+            }
+            if ($('#cardType').text() != '' && !isValidCreditCard($('#cardType').text().toUpperCase(), $('#card').val())) {
+                if (altMsg) {
+                    showMsg('Credit Card Read Error - Try again.');
+                } else {
+                    showMsg('Credit Card Entry Error.');
+                }
+                $('#card').focus();
+            }
+        });
+        function isValidCreditCard(type, ccnum) {
+            var regex = '';
+            if (type == "VISA") {
+                // Visa: length 16, prefix 4, dashes optional.
+                regex = /^4\d{3}-?\d{4}-?\d{4}-?\d{4}$/;
+            } else if (type == "MASTERCARD") {
+                    // Mastercard: length 16, prefix 51-55, dashes optional.
+                regex = /^5[1-5]\d{2}-?\d{4}-?\d{4}-?\d{4}$/;
+            } else if (type == "DISCOVER") {
+                    // Discover: length 16, prefix 6011, dashes optional.
+                regex = /^6011-?\d{4}-?\d{4}-?\d{4}$/;
+            } else if (type == "AMERICAN EXPRESS") {
+                    // American Express: length 15, prefix 34 or 37.
+                regex = /^3[4,7]\d{13}$/;
+            } else if (type == "DINERS CLUB") {
+                    // Diners: length 14, prefix 30, 36, or 38.
+                regex = /^3[0,6,8]\d{12}$/;
+            } else if (type == "JCB") {
+                // JCB: cards beginning with 2131 or 1800 have 15 digits; cards beginning with 35 have 16 digits
+                regex = /^(?:2131|1800|35\d{3})\d{11}$/;
+            }
+            if (!regex.test(ccnum)) return false;
+            // Remove all dashes for the checksum checks to eliminate negative numbers
+            ccnum = ccnum.split("-").join("");
+            // Checksum ("Mod 10")
+            // Add even digits in even length strings or odd digits in odd length strings.
+            var checksum = 0;
+            for (var i = (2 - (ccnum.length % 2)) ; i <= ccnum.length; i += 2) {
+                checksum += parseInt(ccnum.charAt(i - 1));
+            }
+            // Analyze odd digits in even length strings or even digits in odd length strings.
+            for (var i = (ccnum.length % 2) + 1; i < ccnum.length; i += 2) {
+                var digit = parseInt(ccnum.charAt(i - 1)) * 2;
+                if (digit < 10) { checksum += digit; } else { checksum += (digit - 9); }
+            }
+            if ((checksum % 10) == 0) return true; else return false;
+        }
+        $('#expiry').bind('change', function () {
+            var expires = $('#expiry').val().split("/").join("");
+            expires = expires.split("\\").join("");
+            var err = false;
+            if (expires.length == 4) {
+                var oYear = expires.slice(0, 2);
+                var oMonth = expires.slice(2);
+                var d = new Date();
+                var cYear = d.getFullYear() - 2000;
+                var cMonth = d.getMonth() + 1;
+                if (oMonth > 12) { err = true }
+                if (oYear < cYear) { err = true; }
+                else if (oYear == cYear && oMonth < cMonth) { err = true; }
+             } else { err = true; }
+
+            if (err) {
+                showMsg('Expiration Date Error.');
+                $('#expiry').val('');
+                $('#expiry').focus();
+            } else {
+                if (expires != $('#expiry').val()) { $('#expiry').val(expires) };
+            }
+        });
+        $('#name').bind('change', function () {
+            $('#cardType').text($('#cardType').text().toUpperCase());
+        });
+        $('#zip').bind('change', function () {
+
+        });
+
+        // Finish Credit Card
+        $('#btnCreditCardDone').click(function () {
+            var ccErr = false;
+            if ($('#cardType').text() == '') {
+                ccErr = true;
+            }
+            if ($('#card').val() == '') {
+                $('#lcc').css("color", "red");
+                ccErr = true;
+            }
+            if ($('#expiry').val() == '') {
+                $('#lex').css("color", "red");
+                ccErr = true;
+            }
+
+            if (tenderAttributes[thisTender][is_required_postal_code] == true && $('#zip').val() == '') {
+                $('#lzip').css("color", "red");
+                ccErr = true;
+            }
+            if (tenderAttributes[thisTender][is_required_ccv_code] == true && $('#ccv').val() == ''){
+                $('#lccv').css("color", "red");
+                ccErr = true;
+            }
+
+            if (ccErr == true) {
+                showMsg('Please fill all fields.');
+            } else {
+
+                //**** process credit card ****//
+
+                tenderDetails[CurrentCreditCard.target.id][oIs_credit_card] = true;
+                tenderDetails[CurrentCreditCard.target.id][oTenderid] = thisTender;
+                tenderDetails[CurrentCreditCard.target.id][oAmount] = parseFloat($('#chgamt').val().replace(",", ""));
+                tenderDetails[CurrentCreditCard.target.id][oApproval_code] = approvalCode;
+                tenderDetails[CurrentCreditCard.target.id][oToken] = tokenValue;
+                tenderDetails[CurrentCreditCard.target.id][oGl_account_id] = tenderAttributes[thisTender][gl_account_id];
+                tenderDetails[CurrentCreditCard.target.id][oAccount_holder] = $('#name').val();
+                tenderDetails[CurrentCreditCard.target.id][oAccount_nbr] = $('#card').val().slice(-4);
+                tenderDetails[CurrentCreditCard.target.id][oExpiration_date] = $('#expiry').val();
+                tenderDetails[CurrentCreditCard.target.id][oCcv_code] = $('#ccv').val();
+                tenderDetails[CurrentCreditCard.target.id][oPostal_code] = $('#zip').val();
+
+                tenderDetails[CurrentCreditCard.target.id][oSerial_nbr] = '';
+                tenderDetails[CurrentCreditCard.target.id][oRouting_nbr] = '';
+                tenderDetails[CurrentCreditCard.target.id][oState] = '';
+                tenderDetails[CurrentCreditCard.target.id][oLicense_nbr] = '';
+                tenderDetails[CurrentCreditCard.target.id][oBirth_date] = '';
+                tenderDetails[CurrentCreditCard.target.id][oDisplay] = $('#cardType').text();
+
+                addRow(CurrentCreditCard);
+                CurrentCreditCard.target.readOnly = true;
+                $('#' + CurrentCreditCard.target.id).css('color', 'gray');
+                $('#l' + CurrentCreditCard.target.id).text($('#cardType').text() + ':');
+                clearCreditCard();
+                $('#ProcessCreditCard').hide();
+                $('#top').show();
+            }
+        });
+
+        function clearCreditCard() {
+            $('#cardType').text('');
+            $('#chgamt').val('');
+            $('#lca').css("color", "white");
+            $('#card').val('');
+            $('#lcc').css("color", "white");
+            $('#expiry').val('');
+            $('#lex').css("color", "white");
+            $('#name').val('');
+            $('#lnm').css("color", "white");
+            $('#zip').val('');
+            $('#lzip').css("color", "yellow");
+            $('#ccv').val('');
+            $('#lccv').css("color", "yellow");
+            $('#lva').val('');
+        };
+
+        // Finish Voucher
+        $('#btnVoucherDone').click(function () {
+            var notDone = true;
+
+            //**** process gift card ****//
+
+            if (notDone == false) {
+                showMsg('Please fill all fields.');
+            } else {
+                tenderDetails[CurrentVoucher.target.id][oIs_credit_card] = false;
+                tenderDetails[CurrentVoucher.target.id][oTenderid] = thisTender;
+                tenderDetails[CurrentVoucher.target.id][oAmount] = parseFloat($('#' + CurrentVoucher.target.id).val().replace(",", ""));
+                tenderDetails[CurrentVoucher.target.id][oApproval_code] = '';
+                tenderDetails[CurrentVoucher.target.id][oToken] = '';
+                tenderDetails[CurrentVoucher.target.id][oGl_account_id] = tenderAttributes[thisTender][gl_account_id];
+                tenderDetails[CurrentVoucher.target.id][oAccount_holder] = $('#accountholder').val();
+                tenderDetails[CurrentVoucher.target.id][oAccount_nbr] = '';
+                tenderDetails[CurrentVoucher.target.id][oExpiration_date] = '';
+                tenderDetails[CurrentVoucher.target.id][oCcv_code] = '';
+                tenderDetails[CurrentVoucher.target.id][oPostal_code] = '';
+
+                tenderDetails[CurrentVoucher.target.id][oSerial_nbr] = $('#serialnumber').val();
+                tenderDetails[CurrentVoucher.target.id][oRouting_nbr] = $('#routingnumber').val();
+                tenderDetails[CurrentVoucher.target.id][oState] = $('#idstate').val();
+                tenderDetails[CurrentVoucher.target.id][oLicense_nbr] = $('#licensenumber').val();
+                tenderDetails[CurrentVoucher.target.id][oBirth_date] = $('#birthdate').val();
+                tenderDetails[CurrentVoucher.target.id][oDisplay] = tenderAttributes[thisTender][display];
+                addRow(CurrentVoucher);
+                CurrentVoucher.target.readOnly = true;
+                $('#' + CurrentVoucher.target.id).css('color', 'gray');
+                $('#ProcessVoucher').hide();
+                $('#top').show();
+            }
+        });
+
+        function clearVoucher() {
+            $('#vchgamt').val('');
+            $('#gcard').val('');
+            $('#vavailable').val('');
+        };
+
+        // Finish Tender
+        $('#btnAddDone').click(function () {
+            var notDone = true;
+            if (tenderAttributes[thisTender][is_required_account_holder] == true && $('#accountholder').val() == '') {
+                notDone = false;
+                $('#lah').css("color", "red");
+            };
+            if (tenderAttributes[thisTender][is_required_serial_nbr] == true && $('#serialnumber').val() == '') {
+                notDone = false;
+                $('#lsn').css("color", "red");
+            };
+            if (tenderAttributes[thisTender][is_required_routing_nbr] == true && $('#routingnumber').val() == '') {
+                notDone = false;
+                $('#lrn').css("color", "red");
+            };
+            if (tenderAttributes[thisTender][is_required_state] == true && $('#idstate').val() == '') {
+                notDone = false;
+                $('#lst').css("color", "red");
+            };
+            if (tenderAttributes[thisTender][is_required_license_nbr] == true && $('#licensenumber').val() == '') {
+                notDone = false;
+                $('#lln').css("color", "red");
+            };
+            if (tenderAttributes[thisTender][is_required_birth_date] == true && $('#birthdate').val() == '') {
+                notDone = false;
+                $('#lbd').css("color", "red");
+            };
+            if (notDone == false) {
+                showMsg('Please fill all fields.');
+            } else {
+                tenderDetails[CurrentTender.target.id][oIs_credit_card] = false;
+                tenderDetails[CurrentTender.target.id][oTenderid] = thisTender;
+                tenderDetails[CurrentTender.target.id][oAmount] = parseFloat($('#' + CurrentTender.target.id).val().replace(",", ""));
+                tenderDetails[CurrentTender.target.id][oApproval_code] = '';
+                tenderDetails[CurrentTender.target.id][oToken] = '';
+                tenderDetails[CurrentTender.target.id][oGl_account_id] = tenderAttributes[thisTender][gl_account_id];
+                tenderDetails[CurrentTender.target.id][oAccount_holder] = $('#accountholder').val();
+                tenderDetails[CurrentTender.target.id][oAccount_nbr] = '';
+                tenderDetails[CurrentTender.target.id][oExpiration_date] = '';
+                tenderDetails[CurrentTender.target.id][oCcv_code] = '';
+                tenderDetails[CurrentTender.target.id][oPostal_code] = '';
+
+                tenderDetails[CurrentTender.target.id][oSerial_nbr] = $('#serialnumber').val();
+                tenderDetails[CurrentTender.target.id][oRouting_nbr] = $('#routingnumber').val();
+                tenderDetails[CurrentTender.target.id][oState] = $('#idstate').val();
+                tenderDetails[CurrentTender.target.id][oLicense_nbr] = $('#licensenumber').val();
+                tenderDetails[CurrentTender.target.id][oBirth_date] = $('#birthdate').val();
+                tenderDetails[CurrentTender.target.id][oDisplay] = tenderAttributes[thisTender][display];
+                addRow(CurrentTender);
+                $('#AdditionalInfo').hide();
+                $('#top').show();
+            }
+        });
+
+        function clearTender() {
+            $('#accountholder').val('');
+            $('#lah').css("color", "black");
+            $('#serialnumber').val('');
+            $('#lsn').css("color", "black");
+            $('#routingnumber').val('');
+            $('#lrn').css("color", "black");
+            $('#idstate').val('');
+            $('#lst').css("color", "black");
+            $('#licensenumber').val('');
+            $('#lln').css("color", "black");
+            $('#birthdate').val('');
+            $('#lbd').css("color", "black");
+        };
+
+        // Close Process Credit Card
+        $('#exitProcessCreditCard').click(function (e) {
+            clearCreditCard();
+            $('#' + CurrentCreditCard.target.id).val('');
+            $('#' + CurrentCreditCard.target.id).focus();
+            assessInputs(e);
+            $('#ProcessCreditCard').hide();
+            $('#top').show();
+        });
+
+        // Close Gift Card
+        $('#exitVoucher').click(function (e) {
+            clearVoucher();
+            $('#' + CurrentVoucher.target.id).val('');
+            $('#' + CurrentVoucher.target.id).focus();
+            assessInputs(e);
+            $('#ProcessVoucher').hide();
+            $('#top').show();
+        });
+
+        // Close Additional Information
+        $('#exitAdditional').click(function (e) {
+            clearTender();
+            $('#' + CurrentTender.target.id).val('');
+            $('#' + CurrentTender.target.id).focus();
+            assessInputs(e);
+            $('#AdditionalInfo').hide();
+            $('#top').show();
+        });
+
+        // Mouse
+        $('body').dblclick(function (e) {
+            if (e.target.type == 'text' && e.target.className != 'change' && e.target.readOnly == false) {
+                useAll(e);
+            }
+            return false;
+        });
+
+        // Keyboard
+        $('body').keydown(function (e) {
+            if (e.ctrlKey || e.altKey) { return false; };
+            if (e.target.type != "text") { return false; };
+            if (e.target.id == 'card') { return testCardType(e) };
+
+            //adjust for keypad
+            if (e.which >= 96 && e.which <= 105) {
+                e.which -= 48;
+            }
+            //ignore TAB
+            if (e.which == 9 || e.which == 16) {
+                return true;
+            }
+
+            //plus keys
+            if ((e.which == 107 || e.which == 187) && e.target.readOnly == false) {
+                useAll(e);
+                return false;
+            }
+
+            //adjust for CR or arrow down or page down
+            if (e.which == $.ui.keyCode.ENTER || e.which == 40 || e.which == 34) {
+                var x = document.getElementsByTagName("input");
+                for (var i = 0; i < x.length; i++) {
+                    if (e.target.id == x[i].id && i < x.length - 1) {
+                        if (/^\d*$/.test(x[i + 1].id) == true) {
+                            if (x[i + 1].type == "text") {
+                                $('#' + x[i + 1].id).focus();
+                                break;
+                            }
+                        }
+                    }
+                    if (e.target.id == x[i].id && /^\d*$/.test(x[i + 1].id) == false) {
+                        $('#0').focus();
+                        break; 10
+
+                    }
+                }
+                return false;
+            }
+
+            //adjust for arrow up or page up
+            if (e.which == 33 || e.which == 38) {
+                var x = document.getElementsByTagName("input");
+                for (var i = 0; i < x.length; i++) {
+                    if (e.target.id == x[i].id && i < x.length) {
+                        if (i >= 1 && x[i - 1].type == "text") {
+                            $('#' + x[i - 1].id).focus();
+                            break;
+                        } else { break; }
+                    }
+                }
+                return false;
+            }
+
+            //test for delete key
+            if (e.which == 46) {
+                // pass the delete through
+                return true;
+            }
+            else if (e.target.type == 'text' && (e.which == 8 || e.which == 35 || e.which == 36 || e.which == 37 || e.which == 39)) {
+                // pass backspace, end, home, left and right arrows to form if text type input
+                return true;
+            }
+            else if (e.target.type == 'text' && e.which == 27) {
+                    // pass backspace to form if text type input
+                e.target.value = '';
+                return false;
+            }
+            else {
+                // review other codes to see if they should be blocked
+                for (var t = 0; t < blockedKeysArr.length; t++) {
+                    if (e.which == blockedKeysArr[t]) {
+                        //alert("Key Code: " + window.event.keyCode + " This action is not allowed");
+                        if (e.which != 16 && e.which != 17) {
+                            window.event.keyCode = 503;
+                        }; //shift, control
+                        if (e.stopPropagation) e.stopPropagation();
+                        if (e.preventDefault) e.preventDefault();
+                        return false;
+                    }
+                }
+                if (/^\d*$/.test(e.target.id) == true) {
+                    if (e.which != 110 & e.which != 190 && (e.which < 48 || e.which > 57)) { return false };
+                }
+                return true;
+            }
+        });
+         
+        // Test for credit card type
+        function testCardType(e) {
+            $('#lca').css("color", "white");
+            $('#lcc').css("color", "white");
+            $('#lex').css("color", "white");
+            $('#lnm').css("color", "white");
+            $('#lzip').css("color", "yellow");
+            $('#lccv').css("color", "yellow");
+            if ($('#card').val().length == 1 && (e.which == 8 || e.which == 46)) {
+                $('#cardType').text('');
+                $('#zipdiv').hide();
+                $('#ccvdiv').hide();
+                return true;
+            }
+            if ($('#card').val().length >= 1 && e.which == 27) {
+                $('#cardType').text('');
+                $('#zipdiv').hide();
+                $('#ccvdiv').hide();
+                return true;
+            }
+            if ($('#card').val().length == 1 && $('#card').val() == '3' && (e.which == 53 || e.which == 101)) {
+                $('#cardType').text('JCB');
+
+                thisTender = -1;
+                for (var i = 0; i < tenderAttributes.length; i++) {
+                    if (tenderAttributes[i][display].toUpperCase() == $('#cardType').text().toUpperCase()) {
+                        thisTender = i;
+                        break;
+                    }
+                }
+                if (thisTender < 0) {
+                    $('#cardType').text('');
+                    showMsg('Unacceptable Credit Card Type.');
+                    $('#card').focus();
+                    return false;
+                }
+            }
+            if ($('#card').val().length == 0) {
+                if (e.which == 49 || e.which == 50 || e.which == 97 || e.which == 98) {
+                    $('#cardType').text('JCB');
+                } else if (e.which == 51 || e.which == 99) {
+                    $('#cardType').text('American Express');
+                } else if (e.which == 52 || e.which == 100) {
+                    $('#cardType').text('Visa');
+                } else if (e.which == 53 || e.which == 101) {
+                    $('#cardType').text('MasterCard');
+                } else if (e.which == 54 || e.which == 102) {
+                    $('#cardType').text('Discover');
+                } else {
+                    $('#cardType').text('');
+                    showMsg('Unacceptable Credit Card Type.');
+                    $('#card').focus();
+                    return false;
+                };
+
+                thisTender = -1;
+                for (var i = 0; i < tenderAttributes.length; i++) {
+                    if (tenderAttributes[i][display].toUpperCase() == $('#cardType').text().toUpperCase()) {
+                        thisTender = i;
+                        break;
+                    }
+                }
+                if (thisTender < 0) {
+                    $('#cardType').text('');
+                    showMsg('Unacceptable Credit Card Type.');
+                    $('#card').focus();
+                    return false;
+                }
+
+                if (tenderAttributes[thisTender][is_required_postal_code] == true) {
+                    $('#zipdiv').show();
+                } else {
+                    $('#zipdiv').hide();
+                }
+                if (tenderAttributes[thisTender][is_required_ccv_code] == true) {
+                    $('#ccvdiv').show();
+                } else {
+                    $('#ccvdiv').hide();
+                }
+            }
+            return true;
+        };
+
+        // Double-click or +
+        function useAll(e) {
+            if (Total != 0) {
+                // Get the parameter pointer
+                thisTender = -1;
+                for (var i = 0; i < tenderAttributes.length; i++) {
+                    if (tenderAttributes[i][display].toUpperCase() + ':' == $('#o' + e.target.id).text().toUpperCase()) {
+                        thisTender = i;
+                        break;
+                    }
+                }
+                if (thisTender < 0) {
+                    $('#' + e.target.id).val('');
+                    return false;
+                }
+
+                e.target.value = Total.formatMoney(2, '');
+                Total = 0;
+                $('#total').text(Total.formatMoney(2));
+                assessInputs(e);
+
+                if (e.target.className.indexOf('ccard') >= 0) {
+                    processCard(e);
+                } else if (e.target.className.indexOf('voucher') >= 0) {
+                    processVoucher(e);
+                } else {
+                    processTender(e);
+                }
+            }
+        };
+
+        // Evaluate entries
+        function assessInputs(e) {
+            Total = InitialAmount;
+            if ($('#' + e.target.id).val() == 'NaN') { $('#' + e.target.id).val('') };
+            var thisVal = parseFloat($('#' + e.target.id).val().replace(",", ""));
+            var cashAmount = 0.0;
+            var otherAmount = 0.0;
+            var allowCashBack = false;
+            var ret = true;
+
+            $('.tenderType').each(function () {
+                var newVal = 0.0;
+                if ($(this).val() == 'NaN') { $(this).val('') };
+                if ($(this).val() != '') { newVal = parseFloat($(this).val().replace(",", "")) };
+                if (newVal != 0.0) {
+                    // What kind of instrument?
+                    if (tenderAttributes[thisTender][display] == 'Cash' ||
+                        tenderAttributes[thisTender][display] == 'Check' ||
+                        tenderAttributes[thisTender][display] == 'Money Order' ||
+                        tenderAttributes[thisTender][display] == 'Travelers Check') {
+                        // handle cash instruments
+                        if (InitialAmount > 0) {
+                            if (newVal < 0) { newVal = -1 * newVal }
+                        } else {
+                            if (newVal > 0) { newVal = -1 * newVal }
+                        }
+                        $(this).val(newVal.formatMoney(2, ''));
+                        Total -= newVal;
+                        cashAmount += newVal;
+
+                    } else if ($(this)[0].id != 'Change') {
+                            // handle non-cash - see if reasonable amount
+                        if ((InitialAmount > 0 && Total + cashAmount - newVal >= 0) || (InitialAmount < 0 && Total - cashAmount + newVal <= 0)) {
+                            // yes
+                            if (InitialAmount > 0) {
+                                if (newVal < 0) { newVal = -1 * newVal }
+                            } else {
+                                if (newVal > 0) { newVal = -1 * newVal }
+                            }
+                            $(this).val(newVal.formatMoney(2, ''));
+                            Total -= newVal;
+                            otherAmount += newVal;
+
+                        } else if (tenderAttributes[thisTender][is_allow_cash_back] == true) {
+                                // only ok if cash back
+                            if (InitialAmount > 0) {
+                                if (newVal < 0) { newVal = -1 * newVal }
+                            } else {
+                                if (newVal > 0) { newVal = -1 * newVal }
+                            }
+                            var limit = tenderAttributes[thisTender][cash_back_limit];
+                            if (newVal > limit) {
+                                Total += thisVal;
+                                showMsg('Exceeds Cash-Back Limit of ' + limit.formatMoney(2));
+                                $(this).val('');
+                                $(this).focus();
+                                ret = false;
+                            } else {
+                                $(this).val(newVal.formatMoney(2, ''));
+                                Total -= newVal;
+                                otherAmount += newVal;
+                            }
+                        } else {
+                            // invalid
+                            showMsg('Invalid amount. Please re-enter.');
+                            $(this).val('');
+                            $(this).focus();
+                            ret = false;
+                        }
+                    }
+                }
+            })
+
+            //is_allow_cash_back
+            if (InitialAmount > 0 && cashAmount + otherAmount > InitialAmount) {
+                if (tenderAttributes[thisTender][is_allow_cash_back] == true) {
+                    var limit = tenderAttributes[thisTender][cash_back_limit];
+                    var chg = -1 * toFixed(InitialAmount - otherAmount - cashAmount, 2);
+                    if (chg > limit) {
+                        Total += thisVal;
+
+                        showMsg('Exceeds Cash-Back Limit of ' + limit.formatMoney(2));
+                        $(this).val('');
+                        $(this).focus();
+                        $('#oChange').val('');
+                        $('#oChange').hide();
+                        ret = false;
+                    } else {
+                        $('#Change').val((-1 * (InitialAmount - otherAmount - cashAmount)).formatMoney(2, ''))
+                        Total = 0
+                        $('#oChange').show();
+                    }
+                } else {
+                    // invalid
+                    showMsg('Cash back is not allowed.');
+                    $(this).val("");
+                    $(this).focus();
+                    ret = false;
+                }
+            } else {
+                $('#oChange').hide();
+            }
+
+            var adder = 0;
+            if ($('#oChange').is(":visible") == true) { adder = 1 };
+            $('#top').css('height', (Math.max(7, cnt + 5 + adder)) * $("#oChange").height());
+
+            if (Math.abs(Total) < .005) { Total = 0 };
+            if (Total == 0) {
+                $('#tenderFinished').show('slow');
+            } else {
+                $('#tenderFinished').hide();
+            }
+            $('#total').text(Total.formatMoney(2));
+            return ret;
+        };
+
+        function addRow(e) {
+            // Add a new row if allowed
+            if (tenderAttributes[thisTender][is_allow_multiple_entry] == true && $(this)[0].value != '' && Total != 0) {
+                var eID = e.target.id;
+                tenderDetails[cnt] = new Array();
+                tenderDetails[cnt][id] = cnt;
+
+                tenderDetails[cnt] = new Array();
+                tenderDetails[cnt][oId] = cnt;
+                tenderDetails[cnt][oIs_credit_card] = false;
+                tenderDetails[cnt][oTenderid] = -1;
+                tenderDetails[cnt][oAmount] = 0;
+                tenderDetails[cnt][oApproval_code] = '';
+                tenderDetails[cnt][oToken] = '';
+                tenderDetails[cnt][oGl_account_id] = tenderAttributes[thisTender][gl_account_id];
+                tenderDetails[cnt][oAccount_holder] = '';
+                tenderDetails[cnt][oAccount_nbr] = '';
+                tenderDetails[cnt][oExpiration_date] = '';
+                tenderDetails[cnt][oCcv_code] = '';
+                tenderDetails[cnt][oPostal_code] = '';
+                tenderDetails[cnt][oSerial_nbr] = '';
+                tenderDetails[cnt][oRouting_nbr] = '';
+                tenderDetails[cnt][oState] = '';
+                tenderDetails[cnt][oLicense_nbr] = '';
+                tenderDetails[cnt][oBirth_date] = '';
+                tenderDetails[cnt][oDisplay] = '';
+
+                $('<div id="o' + cnt + '"><label id="l' + cnt + '">' + tenderAttributes[eID][display] + ':</label><input type="text" id="' + cnt + '" class="' + e.target.className + '" /></div>').insertAfter($('#o' + eID));
+                $('#' + cnt).bind('change', testInput);
+                cnt += 1;
+            }
+            var adder = 0;
+            if ($('#oChange').is(":visible") == true) { adder = 1 };
+            $('#top').css('height', (Math.max(7, cnt + 5 + adder)) * $("#oChange").height());
+        };
+
+        // See what kind of input
+        function testInput(e) {
+            if (!/^\d*$/.test(e.target.id)) return;
+
+            // Get the parameter pointer
+            thisTender = -1;
+            for (var i = 0; i < tenderAttributes.length; i++) {
+                if (tenderAttributes[i][display].toUpperCase() + ':' == $('#o' + e.target.id).text().toUpperCase()) {
+                    thisTender = i;
+                    break;
+                }
+            }
+            if (thisTender < 0) {
+                $('#' + e.target.id).val('');
+                return false;
+            }
+
+            if ($('#' + e.target.id).val() == 'NaN') { $('#' + e.target.id).val('') };
+            var chg = parseFloat($('#' + e.target.id).val().replace(",", ""));
+            $('#' + e.target.id).val(chg)
+
+            if (e.target.className.indexOf('ccard') >= 0) {
+                if (assessInputs(e) == true) {
+                    processCard(e);
+                }
+            } else if (e.target.className.indexOf('voucher') >= 0) {
+                processVoucher(e);
+            } else if (e.target.className.indexOf('tender') >= 0) {
+                if (assessInputs(e) == true) {
+                    processTender(e);
+                } else {
+                    e.target.value = "";
+                }
+            };
+        };
+
+        // Process a Card
+        function processCard(e) {
+            clearCreditCard();
+            $('#top').hide();
+            var chg = parseFloat($('#' + e.target.id).val().replace(",", ""));
+            $('#chgamt').val(chg.formatMoney(2, ''));
+            CurrentCreditCard = e;
+            $('#ProcessCreditCard').show();
+            $('#card').focus();
+        };
+
+        // Process a Voucher
+        function processVoucher(e) {
+            clearVoucher();
+            $('#top').hide();
+            var chg = parseFloat($('#' + e.target.id).val().replace(",", ""));
+            if (chg < 0) {
+                chg *= -1;
+                $('#vchgamt').val(chg.formatMoney(2, ''));
+                $('#vavaildiv').hide();
+            } else {
+                $('#vchgamt').val(chg.formatMoney(2, ''));
+            }
+            CurrentVoucher = e;
+            $('#ProcessVoucher').show();
+            $('#gcard').focus();
+        }
+
+        // Process Cash, Check, etc.
+        function processTender(e) {
+            var showRequired = false;
+            var heightCount = 7;
+            clearTender();
+
+            if ($('#' + e.target.id).val() != 0) {
+                if (tenderAttributes[thisTender][is_required_account_holder] == true) {
+                    showRequired = true;
+                    $('#ahdiv').show();
+                    heightCount += 1;
+                } else {
+                    $('#ahdiv').hide();
+                }
+                if (tenderAttributes[thisTender][is_required_serial_nbr] == true) {
+                    showRequired = true;
+                    $('#sndiv').show();
+                    heightCount += 1;
+                } else {
+                    $('#sndiv').hide();
+                }
+                if (tenderAttributes[thisTender][is_required_routing_nbr] == true) {
+                    showRequired = true;
+                    $('#rndiv').show();
+                    heightCount += 1;
+                } else {
+                    $('#rndiv').hide();
+                }
+                if (tenderAttributes[thisTender][is_required_state] == true) {
+                    showRequired = true;
+                    $('#stdiv').show();
+                    heightCount += 1;
+                } else {
+                    $('#stdiv').hide();
+                }
+                if (tenderAttributes[thisTender][is_required_license_nbr] == true) {
+                    showRequired = true;
+                    $('#lndiv').show();
+                    heightCount += 1;
+                } else {
+                    $('#lndiv').hide();
+                }
+                if (tenderAttributes[thisTender][is_required_birth_date] == true) {
+                    showRequired = true;
+                    $('#bddiv').show();
+                    heightCount += 1;
+                } else {
+                    $('#bddiv').hide();
+                }
+
+            }
+
+            CurrentTender = e;
+            if ($('#o' + e.target.id).text().toUpperCase().indexOf('BULK') >= 0 && $('#' + e.target.id).val() != '') {
+                showMsg('Bill will be mailed from corporate.\nNet 30 days.');
+            }
+
+            if ($('#o' + e.target.id).text().toUpperCase().indexOf('CHECK') >= 0 && $('#' + e.target.id).val() != '') {
+                showMsg('No temporary or out of state checks.');
+            }
+            if (showRequired == true) {
+                $('#top').hide();
+                $('#AdditionalInfo').css('height', (Math.max(7, heightCount)) * $("#ahdiv").height());
+                $('#infoType').text($('#o' + e.target.id).text());
+                $('#AdditionalInfo').show();
+            } else {
+                $('#btnAddDone').trigger('click');
+            }
+        };
+</script>
+</body>
+</html>

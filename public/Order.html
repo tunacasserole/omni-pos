@@ -1,0 +1,2548 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Customer Order</title>
+    <!--
+Modifications and settings for Firefox:
+        about:config:
+            dom.disable_window_open_feature.location -> false           allows hiding popup location bar
+            zoom.minPercent -> 100                                      keeps user from making less than full screen
+            add new integer dom.successive_dialog_time_limit -> 0       disables "alert" potential lockup
+       
+    Firefox -> Options -> Options:     
+        Settings: -> Options:
+            Tabs -> uncheck "Waren me when closing multiple tabs"
+            Tabs -> uncheck "Always show the tab bar"
+            Content -> uncheck "Block pop-up windows"
+            Advanced -> General -> Uncheck "Always check to see if Firefox ... default ...browser"
+            Advanced -> Update -> check "Never check for updates"
+            Advanced -> Update -> check "Search Engines"
+    Firefox -> Options -> uncheck "Navigation Bar"
+
+    F11
+
+References:
+        geonames.org
+        smartystreets.com
+
+    -->
+
+    <!-- Styles Used/Referenced -->
+    <link rel="stylesheet" href="Styles/Slick.Grid.css" type="text/css" />
+    <link rel="stylesheet" href="Styles/jquery-ui-1.8.23.custom.min.css" type="text/css" />
+    <link rel="stylesheet" href="Styles/examples.css" type="text/css" />
+    <link rel="stylesheet" href="Styles/datePicker.css" type="text/css" />
+    <link rel="stylesheet" href="Styles/POS.css" type="text/css" />
+
+    <!-- Javascript Imports -->
+    <script type="text/javascript" src="Scripts/dispDate.js"></script>
+    <script type="text/javascript" src="Scripts/firebugx.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-1.8.1.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.23.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery.event.drag-2.0.min.js"></script>
+    <script type="text/javascript" src="Scripts/Slick.Core.js"></script>
+    <script type="text/javascript" src="Scripts/Slick.Grid.js"></script>
+    <script type="text/javascript" src="Scripts/Slick.Formatters.js"></script>
+    <script type="text/javascript" src="Scripts/Slick.Editors.js"></script>
+    <script type="text/javascript" src="Scripts/Slick.RowSelectionModel.js"></script>
+    <script type="text/javascript" src="Scripts/textinputs_jquery.js"></script>
+    <script type="text/javascript" src="Scripts/UUID.core.js"></script>
+    <script type="text/javascript" src="Scripts/date.js"></script>
+    <script type="text/javascript" src="Scripts/datePicker.js"></script>
+        <!-- <script type="text/javascript" src="Scripts/hoverbox.js"></script> -->
+    <script type="text/javascript" src="Scripts/POS.custom.js"></script>
+</head>
+<body onload="clearCustomer()">
+<form id="form1" action="javascript:void(0);">
+    <!--  header -->
+    <div id="header">
+            <span class="descripHdr">&nbsp;&nbsp;Store: </span>
+            <span class="store" id="storeNum">&nbsp;&nbsp;41</span>
+            <span class="descripHdr">&nbsp;&nbsp;Register: </span>
+            <span class="register" id="register">&nbsp;&nbsp;411</span>
+            <span class="descripHdr">&nbsp;&nbsp;Cashier: </span>
+            <span class="cashier" id="cashier">&nbsp;&nbsp;Melissa</span>
+        <span id='headerMessage' style="font-size:1em; font-weight: bold; padding-left: 260px;">Parker POS</span>
+        <span style="float:right; padding-top: 0.8em; padding-right: 4px; font-size: 0.5em;">
+            Powered by geonames.org
+        </span>
+    </div>
+
+    <!-- customer information -->
+    <div id="sidebar-left" style="overflow:hidden;">
+        <div id="sidebar-header" style="border: none; margin-top: .05em; height: 5em;">
+            <div style="border-top: none; border-left:none;">
+                <p class="descrip" style="text-align:center">Customer</p>
+            </div>
+            <div style="border:none; margin-top: 3px;">
+                <button id="btnHistory" type="button" class="cbuttons" style="background-color:blue; color:white;">History</button>
+                <button id="btnCustomerNotes" type="button" class="cbuttons" style="background-color:aqua; color:black;">Notes</button>
+                <button id="btnClearCustomer" type="button" class="cbuttons" style="background-color:violet; color:white;">Clear</button>
+                <button id="btnSaveCustomer" type="button" class="cbuttons" style="background-color:thistle; color:black;">Save</button>
+            </div>
+        </div>
+        <div style="height:2em; border-left:none;">
+            <span id="DivA" class="descrip" style="display: inline-block; padding-top:0.3em;">&nbsp;Address:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;International</span>
+            <input style="float:right; clear:right; margin-right:1em;" type="checkbox" id="international" />
+        </div>
+        <div style="border:none;">
+            <span style="width:50%; float:left; clear:left;">
+                <label for="residential"; style="padding-top: .3em !important;">Residential:&nbsp;</label>
+                <input type="radio" name="group1" id="residential" />
+            </span>
+            <span style="width:50%; float:right;clear:right;">
+                <label for="business"; style="padding-top: .3em !important;">Business:&nbsp;</label>
+                <input type="radio" name="group1" id="business" />
+            </span>
+        </div>
+        <div id="addressEntries" style="margin-top: 1em; border: none;">
+            <div class="ui-widget-content">
+                <label id="phonelabel" for="phone">Phone:</label>
+                <input type="text" id="phone" class="cust_input"  />
+            </div>
+            <div class="ui-widget-content">
+                <label id="altphonelabel" for="altphone">Alt Phone:</label>
+                <input type="text" id="altphone" class="cust_input" />
+            </div>
+            <div class="ui-widget-content">
+                <label id="lastnamelabel" for="lastName">Last Name:</label>
+                <input type="text" id="lastName" class="cust_input" />
+            </div>
+            <div class="customer">
+                <label id="firstnamelabel" for="firstName">First Name:</label>
+                <input type="text" class="cust_input" id="firstName" />
+            </div>
+            <div class="customer">
+                <label id="address1label" for="address1">Address:</label>
+                <input type="text" class="cust_input"" id="address1" />
+            </div>
+            <div class="customer">
+                <label id="address2label" for="address2"></label>
+                <input type="text" class="cust_input" id="address2" />
+            </div>
+            <div class="customer">
+                <label id="zipcodelabel" for="zipCode">ZIP Code:</label>
+                <input type="text" class="cust_input" id="zipCode" />
+            </div>
+            <div class="ui-widget-content">
+                <label id="citylabel" for="city">City:</label>
+                <input type="text" id="city" class="cust_input" />
+            </div>
+            <div class="customer">
+                <label id="statelabel" for="state">State:</label>
+                <input type="text" class="cust_input" id="state" />
+            </div>
+            <div class="customer">
+                <label id="countrylabel" for="country">Country:</label>
+                <input type="text" class="cust_input" id="country" />
+            </div>
+            <div class="ui-widget-content">
+                <label id="emaillabel" for="email">EMail:</label>
+                <input type="text" id="email" class="cust_input" />
+            </div>
+            <div class="ui-widget-content">
+                <label id="cschoollabel" for="cschool">School:</label>
+                <input type="text" id="cschool" class="cust_input" />
+            </div>
+            <div style="clear:both; border: none;"></div>
+        </div>
+
+        <div style="height:2em; margin-top: 1em; border-left:none;">
+            <span id="DivS" class="descrip" style="display: inline-block; padding-top:0.3em;">&nbsp;Shipping:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;International</span>
+            <input style="float:right; clear:right; margin-right:1em;"  type="checkbox" id="shipinternational" />
+        </div>
+        <div style="border:none;">
+            <span style="width:50%; float:left; clear:left;">
+                <label for="sresidential"; style="padding-top: .3em !important;">Residential:&nbsp;</label>
+                <input type="radio" name="group2" id="sresidential" />
+            </span>
+            <span style="width:50%; float:right;clear:right;">
+                <label for="sbusiness"; style="padding-top: .3em !important;">Business:&nbsp;</label>
+                <input type="radio" name="group2" id="sbusiness" />
+            </span>
+        </div>
+        <div id="shipEntries"  style="margin-top: 4px; border: none;">
+            <div class="ui-widget-content">
+                <label  id="sphonelabel" for="sphone">Phone:</label>
+                <input type="text" id="sphone" class="cust_input" />
+            </div>
+            <div class="ui-widget-content">
+                <label  id="saltphonelabel" for="saltphone">Alt Phone:</label>
+                <input type="text" id="saltphone" class="cust_input" />
+            </div>
+            <div class="ui-widget-content">
+                <label id="slastnamelabel" for="slastName">Last Name:</label>
+                <input type="text" id="slastName" class="cust_input" />
+            </div>
+            <div class="customer">
+                <label id="sfirstnamelabel" for="sfirstName">First Name:</label>
+                <input type="text" class="cust_input" id="sfirstName" />
+            </div>
+            <div class="customer">
+                <label id="saddress1label" for="saddress1">Address:</label>
+                <input type="text" class="cust_input" id="saddress1" />
+            </div>
+            <div class="customer">
+                <label id="saddress2label" for="saddress2"></label>
+                <input type="text" class="cust_input" id="saddress2" />
+            </div>
+            <div class="customer">
+                <label id="szipcodelabel" for="szipCode">ZIP Code:</label>
+                <input type="text" class="cust_input" id="szipCode" />
+            </div>
+            <div class="ui-widget-content">
+                <label id="scitylabel" for="scity">City:</label>
+                <input type="text" id="scity" class="cust_input" />
+            </div>
+            <div class="customer">
+                <label id="sstatelabel" for="sstate">State:</label>
+                <input type="text" class="cust_input" id="sstate" />
+            </div>
+            <div class="customer">
+                <label id="scountrylabel" for="scountry">Country:</label>
+                <input type="text" class="cust_input" id="scountry" />
+            </div>
+            <div class="ui-widget-content">
+                <label id="semaillabel" for="semail">EMail:</label>
+                <input type="text" id="semail" class="cust_input" />
+            </div>
+            <div style="clear:both; border: none;"></div>
+        </div>
+    </div>
+
+    <!-- main grid -->
+    <div id="content">
+        <div id="myDate">
+            <span style="display:inline-block; margin-bottom:1.5em;">
+                <label for='bschool' style='position:absolute; left:4px; top:2px; font-size:1.2em;'>Change School:</label>
+                <input class="cust_input" type='text' id='bschool' style='width:160px !important; position:absolute; left:120px; top:6px; text-overflow: ellipsis;'/>
+                <label for="male"; style='position:absolute; left:310px; top:4px;'>Boy:</label>
+                <input type="radio" name="group3" id="male" style='position:absolute; left:340px; top:6px;' />
+                <label for="female"; style='position:absolute; left:370px; top:4px;'>Girl:</label>
+                <input type="radio" name="group3" id="female" style='position:absolute; left:400px; top:6px;' />
+                <label for="gradesComboBox"; style='position:absolute; left:430px; top:4px;'>Grade:</label>
+                <select name="grades" id="gradesComboBox" style='position:absolute; left:476px; top:8px; text-align:center;'>
+                    <option value="all">&nbsp;&nbsp;&nbsp;All Items</option>
+                    <option value="PreK">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pre-K</option>
+                    <option value="K">Kindergarten</option>
+                    <option value="1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1st</option>
+                    <option value="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2nd</option>
+                    <option value="3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3rd</option>
+                    <option value="4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4th</option>
+                    <option value="5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5th</option>
+                    <option value="6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6th</option>
+                    <option value="7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;7th</option>
+                    <option value="8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;8th</option>
+                    <option value="9">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;9th</option>
+                    <option value="10">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;10th</option>
+                    <option value="11">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;11th</option>
+                    <option value="12">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;12th</option>
+                </select>
+            </span>
+            <span id="showDate" style="float:right; clear:right; margin-top:7px; margin-right:3px;" title="showDate">
+                <script type="text/javascript">dispDate(0)</script>
+            </span>
+        </div>
+
+        <div id="buttonArea" style="border-bottom: 1px;">
+             &nbsp;&nbsp;
+            <button id="findItem" type="button" class="buttons" style="background-color:#27ba18; color:white;">Find Item</button>
+            <button id="heatApplied" type="button" class="buttons">Heat Applied</button>
+            <button id="embroidered" type="button" class="buttons">Embroidered</button>
+            <button id="sewn" type="button" class="buttons">Sewn</button>
+            <button id="giftCard" type="button" class="buttons" style="margin-left: 4em; background-color:lemonchiffon; color:black;">Gift Card</button>
+            <button id="requirements" type="button" class="buttons" style="margin-left: 4em; background-color:lightblue; color:black;">Show Requirements</button>
+
+            <button id="Exit" type="button" class="buttons" onclick="javascript: history.go(-1)" style="background-color:tomato; color:white; position:absolute; left:700px;">Exit</button>
+        </div>
+
+        <div id="myGrid" style="border-left:none;"></div>
+
+        <div id="footer">
+            <div style="border:none;"></div>
+            <div style="display: inline; border:none">
+                <span class="tender">&nbsp;&nbsp;Tender</span>
+            </div>
+            <div style="display: inline; border:none">
+                <span">&nbsp;&nbsp;&nbsp;Subtotal: </span>
+                <span id="subtotal" class="tender">&nbsp;</span>
+            </div>
+            <div style="display: inline; border:none">
+                <span>&nbsp;&nbsp;&nbsp;Tax: </span>
+                <span id="tenderTax" class="tender">&nbsp;</span>
+            </div>
+            <div style="display: inline; border:none">
+                <span>&nbsp;&nbsp;&nbsp;Shipping: </span>
+                <span id="shipping" class="tender">&nbsp;</span>
+            </div>
+            <div style="display: inline; border:none">
+                <span>&nbsp;&nbsp;&nbsp;Total: </span>
+                <span id="total" class="tender">&nbsp;</span>
+            </div>
+            <div style="display: inline; float:right; clear:right; border:none;">
+                <button id="btnPay" type="button" class="buttons"  style="background-color:green; color:#f5f5f5; height:24px;">Pay</button>
+                &nbsp;&nbsp;
+            </div>
+        </div>
+
+        <div id="functionButtons">
+            <button id="btnReturn" type="button" class="fbuttons" >Return</button>
+            <button id="btnOrderNotes" type="button" class="fbuttons">Order Notes</button>
+            <button id="btnSuspend" type="button" class="fbuttons" >Suspend</button>
+            <button id="btnRetrieve" type="button" class="fbuttons" style="background-color:lemonchiffon; color:black;">Get Suspended</button>
+            <button id="btnReceipts" type="button" class="fbuttons" >Receipts</button>
+            <button id="btnPrintLast" type="button" class="fbuttons" >Reprint Last</button>
+            <button id="btnCancel" type="button" class="fbuttons" style="background-color:tomato; color:white; float:right; clear:right; margin-right:1em;">Cancel</button>
+        </div>
+    </div>
+</form>
+    <!-- TRBL -->
+
+    <!-- Requirements Grid -->
+    <div id="getRequirements" style="display:none;">
+        <div style="border:none;">
+            <img id='exitRequirements' src="Images/round-exit.png" alt="Exit" style="position:absolute; left:960px; top:0px; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div id="getRequirementsMessage" style="text-align:center; margin:1em 0 1em 0; font-family:Arial; font-size: 18px; font-weight: bold; border:none !important; color:black">
+            Message!
+        </div>
+        <div id="getRequirementsGrid"></div>
+        <div style="border:none; margin-top:3em;">
+            <button type="button" class="fbuttons" id="doneRequirements" style="position:absolute; top:680px; left:5em; background-color:#1d98ec; color:white;" >Done</button>
+        </div>
+
+    </div>
+
+    <!-- Suspend -->
+    <div id="suspend" style="display:none;">
+        <div style="border:none;">
+            <img id='exitSuspend' src="Images/round-exit.png" alt="Exit" style="position:absolute; left:960px; top:0px; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div id="suspendDiv" class="center">
+            <label for="suspendNote" style="margin: .9em 0 0 .5em; font-size: 1.1em;">Please Enter a Description:</label>
+            <input type="text" id="suspendNote" style="width: 200px; margin: 1.1em .5em 0 1em; font-size: 1.2em;" />
+        </div>
+        <div style="border:none; margin-top:32em; margin-left: 5em;">
+            <button type="button" class="fbuttons" id="suspendOK" style="font-size: 1.1em;">OK</button>
+        </div>
+    </div>
+
+    <!-- Suspend/Old Receipt Select Grid -->
+    <div id="getData" style="display:none;">
+        <div style="border:none;">
+            <img id='exitGetData' src="Images/round-exit.png" alt="Exit" style="position:absolute; left:960px; top:0px; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div id="getDataMessage" style="text-align:center; margin:1em 0 1em 0; font-family:Arial; font-size: 18px; font-weight: bold; border:none !important; color:white">
+            Message!
+        </div>
+        <div style="margin-bottom: 6em; border:none;">
+            <div style="position:absolute; left:42px; top:60px; border:none;">
+                <label style="color:white; padding-top:.3em">From Date:&nbsp;&nbsp;</label> <input type="text" id="fromDatepicker" class="date-pick"  />
+            </div>
+            <div style="position:absolute; left:298px; top:60px;  border:none;">
+                <label style="color:white; padding-top:.3em">To Date:&nbsp;&nbsp;</label> <input type="text" id="toDatepicker" class="date-pick"  />
+            </div>
+            <div style="position:absolute; left:540px; top:60px;  border:none;">
+                <label for="terminalsComboBox" style="color:white; padding-top:.3em">Location:&nbsp;&nbsp;</label>
+                <select name="terminals" id="terminalsComboBox" style='text-align:left; margin-top:.2em; width:280px;'>
+                    <option value="none">None</option>
+                </select>
+            </div>
+            <div style="position:absolute; left:890px; top:54px;  border:none;">
+                <button type="button" class="fbuttons" id="btnSearch" style="height: 30px; background-color:white;">Search</button>
+            </div>
+                    </div>
+        <div id="getDataGrid" style="border:none !important;"></div>
+        <div style="position:absolute; left:56px; top:700px; border:none;">
+            <button type="button" class="fbuttons" id="getDataSelect">Select</button>
+        </div>
+        <div id="scanReceiptDiv" style="position:absolute; left:400px; top:690px; border:none; display:none;">
+                <label for="scanReceipt" style="margin: .9em 0 0 .5em; font-size: 1.1em;">Scan Receipt Number:</label>
+                <input type="text" id="scanReceipt" style="width: 200px; margin: 1.1em .5em 0 1em; font-size: 1.2em;" />
+        </div>
+    </div>
+
+    <!-- Customer Select Grid -->
+    <div id="getCustomer" style="display:none;">
+        <div style="border:none;">
+            <img id='exitGetCustomer' src="Images/round-exit.png" alt="Exit" style="position:absolute; left:960px; top:0px; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div id="getCustomerMessage" style="text-align:center; margin:1em 0 1em 0; font-family:Arial; font-size: 18px; font-weight: bold; border:none !important; color:black">
+            Message!
+        </div>
+        <div id="getCustomerGrid"></div>
+        <div style="border:none; margin-top:3em;">
+            <button type="button" class="fbuttons" id="getCustomerSelect" style="background-color:#1d98ec; color:white; position:absolute; top:680px; left:5em;" >Select</button>
+            <button type="button" class="fbuttons" id="getCustomerNone" style="background-color:tomato; color:white; position:absolute; top:680px; left:866px;">None</button>
+        </div>
+
+    </div>
+
+    <!-- Customer Shipping Select Grid -->
+    <div id="getShipping" style="display:none;">
+        <div style="border:none;">
+            <img id='exitGetShipping' src="Images/round-exit.png" alt="Exit" style="position:absolute; left:960px; top:0px; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div id="getShippingMessage" style="text-align:center; margin:1em 0 1em 0; font-family:Arial; font-size: 18px; font-weight: bold; border:none !important; color:black">
+            Message!
+        </div>
+        <div id="getShippingGrid"></div>
+        <div style="border:none; margin-top:3em;">
+            <button type="button" class="fbuttons" id="getShippingSelect" style="background-color:#1d98ec; color:white; position:absolute; top:680px; left:5em;" >Select</button>
+            <button type="button" class="fbuttons" id="getShippingNone" style="background-color:tomato; color:white; position:absolute; top:680px; left:866px;">None</button>
+        </div>
+
+    </div>
+
+    <!-- Customer History Grid -->
+    <div id="getHistory" style="display:none;">
+        <div style="border:none;">
+            <img id='exitHistory' src="Images/round-exit.png" alt="Exit" style="position:absolute; left:960px; top:0px; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div id="getHistoryMessage" style="text-align:center; margin:1em 0 1em 0; font-family:Arial; font-size: 18px; font-weight: bold; border:none !important; color:black">
+            Message!
+        </div>
+        <div id="getHistoryGrid"></div>
+        <div style="border:none; margin-top:3em;">
+            <button type="button" class="fbuttons" id="doneHistory" style="position:absolute; top:680px; left:5em; background-color:#1d98ec; color:white;" >Done</button>
+        </div>
+
+    </div>
+
+    <!-- Return Reasons Grid -->
+    <div id="returnReasons" style="display:none;">
+        <div style="border:none;">
+            <img id='exitReturnReasons' src="Images/round-exit.png" alt="Exit" style="position:absolute; left:960px; top:0px; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div id="returnReasonsGrid"></div>
+        <div style="border:none; margin-top:3em;">
+            <button type="button" class="fbuttons" id="returnReasonsSelect" style="position:absolute; top:680px; left:5em; background-color:#1d98ec; color:white;" >Select</button>
+        </div>
+    </div>
+
+    <!-- Manage Gift Cards -->
+    <div id="manageGiftCards" style="display:none;">
+        <div style="border:none;">
+            <img id='exitManageGiftCards' src="Images/round-exit.png" alt="Exit" style="position:absolute; left:960px; top:0px; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div id="giftCardsGrid"></div>
+        <div style="border:none; margin-top:3em;">
+            <button type="button" class="fbuttons" id="deleteGiftCard" style="position:absolute; top:680px; left:5em; background-color:yellow; color:black;" >Delete</button>
+            <button type="button" class="fbuttons" id="btnExitManageGiftCards" style="position:absolute; top:680px; left:866px; background-color:tomato; color:white;" >Done</button>
+        </div>
+    </div>
+
+    <!-- Items Row Delete menu -->
+    <ul id="contextMenu" style="display:none; position:absolute">
+        <li id="msg" style="font-weight:bold; font-style:italic;">Click &quot;Delete&quot; to Delete this item:</li>
+        <li id="delete" style="color:red; background: url('Images/delete.png') 5% no-repeat;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Delete</li>
+        <li id="cancel" style="background: url('Images/x.png') 5% no-repeat; background-size: 15px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cancel</li>
+    </ul>
+
+    <!-- Message Box (replaces alert) -->
+    <div id="msgBox" style="display:none;"></div>
+    <div id="_msgBox" style="display:none;">
+        <div style="text-align:center; margin-top:1em; border:none !important;">
+            <span id="msgText" style="font-size:1.5em; font-weight:bold;">Message!</span>
+        </div>
+        <div id="btnCenter" style="text-align:center; border:none !important;">
+            <button type="button" id="btnMsgOK" style="position: absolute; top: 150px; left: 170px; width: 60px; font-size:1.5em;">OK</button>
+        </div>
+    </div>
+
+    <!-- Customer Notes -->
+    <div id="CustomerNotes" style="display:none;">
+        <div style="border:none;">
+            <img id='exitCustomerNotes' src="Images/round-exit.png" alt="Exit" style="float:right; clear:right; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div style="border:none; margin-top:1em; text-align:center; font-family:Arial; font-size:1.2em; font-weight: bold;">Customer Notes</div>
+        <div style="border:none; margin-top:1em; margin-left: 2em;">
+            <textarea id="notesArea" rows="10" cols="40" style="font:Arial,,Normal,16" name="notesArea"></textarea>
+        </div>
+        <div style="border:none; margin-top:1em; margin-left: 2em;">
+            <button type="button" id="updateCustomerNotes">Update</button>
+        </div>
+    </div>
+
+    <!-- Order Notes -->
+    <div id="OrderNotes" style="display:none;">
+        <div style="border:none;">
+            <img id='exitOrderNotes' src="Images/round-exit.png" alt="Exit" style="float:right; clear:right; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div style="border:none; margin-top:1em; text-align:center; font-family:Arial; font-size:1.2em; font-weight: bold;">Order Notes -<br />Will be Printed on the Receipt</div>
+        <div style="border:none; margin-top:1em; margin-left: 2em;">
+            <textarea id="oNotesArea" rows="10" cols="40" style="font:Arial,,Normal,16" name="oNotesArea"></textarea>
+        </div>
+        <div style="border:none; margin-top:1em; margin-left: 2em;">
+            <button type="button" id="updateOrderNotes">Update</button>
+        </div>
+    </div>
+
+    <!-- Find Item - Selection Buttons Screen -->
+    <div id="selectItem" style="display:none">
+        <div style="border:none;">
+            <img id="selectItemExit" src="Images/round-exit.png" alt="Exit" style="position:absolute; left:960px; top:0px; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div id="findItemMessage" style="text-align:center; margin:.5em 0 0 0; font-family:Arial; font-size: 18px; font-weight: bold; border:none !important; color:white;">
+            Message!
+        </div>
+    <div style="margin-left:40px; margin-top:40px; border:none !important;">
+        <div id="row1" class="selectItemRows">
+            <button id="b0" type="button" class="sbuttons"></button>
+            <button id="b1" type="button" class="sbuttons"></button>
+            <button id="b2" type="button" class="sbuttons"></button>
+            <button id="b3" type="button" class="sbuttons"></button>
+            <button id="b4" type="button" class="sbuttons"></button>
+            <button id="b5" type="button" class="sbuttons"></button>
+            
+        </div>
+        <div id="row2" class="selectItemRows">
+            <button id="b6" type="button" class="sbuttons"></button>
+            <button id="b7" type="button" class="sbuttons"></button>
+            <button id="b8" type="button" class="sbuttons"></button>
+            <button id="b9" type="button" class="sbuttons"></button>
+            <button id="b10" type="button" class="sbuttons"></button>
+            <button id="b11" type="button" class="sbuttons"></button>
+        </div>
+        <div id="row3" class="selectItemRows">
+            <button id="b12" type="button" class="sbuttons"></button>
+            <button id="b13" type="button" class="sbuttons"></button>
+            <button id="b14" type="button" class="sbuttons"></button>
+            <button id="b15" type="button" class="sbuttons"></button>
+            <button id="b16" type="button" class="sbuttons"></button>
+            <button id="b17" type="button" class="sbuttons"></button>
+
+        </div>
+        <div id="row4" class="selectItemRows">
+            <button id="b18" type="button" class="sbuttons"></button>
+            <button id="b19" type="button" class="sbuttons"></button>
+            <button id="b20" type="button" class="sbuttons"></button>
+            <button id="b21" type="button" class="sbuttons"></button>
+            <button id="b22" type="button" class="sbuttons"></button>
+            <button id="b23" type="button" class="sbuttons"></button>
+        </div>
+        <div id="row5" class="selectItemRows">
+            <button id="b24" type="button" class="sbuttons"></button>
+            <button id="b25" type="button" class="sbuttons"></button>
+            <button id="b26" type="button" class="sbuttons"></button>
+            <button id="b27" type="button" class="sbuttons"></button>
+            <button id="b28" type="button" class="sbuttons"></button>
+            <button id="b29" type="button" class="sbuttons"></button>
+        </div>
+        <div id="row6" class="selectItemRows">
+            <button id="b30" type="button" class="sbuttons"></button>
+            <button id="b31" type="button" class="sbuttons"></button>
+            <button id="b32" type="button" class="sbuttons"></button>
+            <button id="b33" type="button" class="sbuttons"></button>
+            <button id="b34" type="button" class="sbuttons"></button>
+            <button id="b35" type="button" class="sbuttons"></button>
+
+        </div>
+        <div id="row7" class="selectItemRows">
+            <button id="b36" type="button" class="sbuttons"></button>
+            <button id="b37" type="button" class="sbuttons"></button>
+            <button id="b38" type="button" class="sbuttons"></button>
+            <button id="b39" type="button" class="sbuttons"></button>
+            <button id="b40" type="button" class="sbuttons"></button>
+            <button id="b41" type="button" class="sbuttons"></button>
+        </div>
+        <div id="decisionRow" class="selectItemRows" style="position:absolute; top:670px;">
+            <button id="btnBack" type="button" title="Back"></button>
+            <button id="btnMore" type="button" title="More">More</button>
+        </div>
+    </div>
+    </div>
+
+    <!-- Select Heat-Applied, Stitched, Sewn -->
+    <div id="selectHSS" style="display:none">
+        <div style="border:none;">
+            <img id="selectHSSexit" src="Images/round-exit.png" alt="Exit" style="position:absolute; left:960px; top:0px; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+        </div>
+        <div id="selectHSSMessage" style="text-align:center; margin:.5em 0 0 0; font-family:Arial; font-size: 18px; font-weight: bold; border:none !important; color:white;">
+            Message!
+        </div>
+    <div style="margin-left:40px; margin-top:40px; border:none !important;">
+        <div id="HSSrow1" class="selectItemRows">
+            <button id="hs0" type="button" class="hbuttons"></button>
+            <button id="hs1" type="button" class="hbuttons"></button>
+            <button id="hs2" type="button" class="hbuttons"></button>
+            <button id="hs3" type="button" class="hbuttons"></button>
+            <button id="hs4" type="button" class="hbuttons"></button>
+            <button id="hs5" type="button" class="hbuttons"></button>
+        </div>
+        <div id="HSSRow2" class="selectItemRows">
+            <button id="hs6" type="button" class="hbuttons"></button>
+            <button id="hs7" type="button" class="hbuttons"></button>
+            <button id="hs8" type="button" class="hbuttons"></button>
+            <button id="hs9" type="button" class="hbuttons"></button>
+            <button id="hs10" type="button" class="hbuttons"></button>
+            <button id="hs11" type="button" class="hbuttons"></button>
+        </div>
+        <div id="HSSRow3" class="selectItemRows">
+            <button id="hs12" type="button" class="hbuttons"></button>
+            <button id="hs13" type="button" class="hbuttons"></button>
+            <button id="hs14" type="button" class="hbuttons"></button>
+            <button id="hs15" type="button" class="hbuttons"></button>
+            <button id="hs16" type="button" class="hbuttons"></button>
+            <button id="hs17" type="button" class="hbuttons"></button>
+        </div>
+        <div id="HSSRow4" class="selectItemRows">
+            <button id="hs18" type="button" class="hbuttons"></button>
+            <button id="hs19" type="button" class="hbuttons"></button>
+            <button id="hs20" type="button" class="hbuttons"></button>
+            <button id="hs21" type="button" class="hbuttons"></button>
+            <button id="hs22" type="button" class="hbuttons"></button>
+            <button id="hs23" type="button" class="hbuttons"></button>
+        </div>
+        <div id="HSSdecisionrow" class="selectItemRows" style="position:absolute; top:670px;">
+            <button id="btnHSSback" type="button" title="Back"></button>
+            <button id="btnHSSmore" type="button" title="More">More</button>
+        </div>
+    </div>
+    </div>
+
+    <!-- Voucher -->
+    <div id="ProcessVoucher" style="display:none; font-size: 1.6em; font-weight:bold;">
+    <div style="border:none;">
+        <img id='exitVoucher' src="Images/round-exit.png" alt="Exit" style="float:right; clear:right; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em;" />
+    </div>
+    <div id="voucherType" style="margin-top:1em; border:none;"></div>
+    <div id="vamtdiv" style="margin-top:1em; float:left; clear:left; border:none;">
+        <label for="vchgamt" style="
+            width:140px;
+            float:left;
+            clear:left;
+            padding-left: 2em;">Amount:</label>
+        <input type="text" id="vchgamt" style="text-align: right; width: 160px;
+        text-align: right;
+        float:right;
+        clear:right; 
+        margin-right: 2em;" />
+    </div>
+    <div id="vscandiv" style="margin-top:1em; float:left; clear:left; border:none;">
+        <label for="gcard" style="
+            width:140px;
+            float:left;
+            clear:left;
+            padding-left: 2em;">Gift Card Number:</label>
+        <input type="text" id="gcard" style="width: 160px;
+        text-align: right;
+        float:right;
+        clear:right; 
+        margin-right: 2em;" />
+    </div>
+    <div style="clear:both; border:none;"></div>
+    <div style="margin-top: 3em; border:none;">
+        <button type="button" id="btnVoucherDone" style="margin-left:2em;">Apply</button>
+    </div>
+</div>
+
+    <!-- Waiting ... -->
+    <div id="waiting" style="display:none;">
+            <img id="loading" alt="Loading" src="Images/loading.gif" style=" width:60px; height:60px;" />
+    </div>
+
+    <!-- Constants, Variables -->
+    <script type="text/javascript">
+        // constants
+        oId = 0;
+        oIs_credit_card = 1;
+        oTenderid = 2;
+        oAmount = 3;
+        oApproval_code = 4;
+        oToken = 5;
+        oGl_account_id = 6;
+        oAccount_holder = 7;
+        oAccount_nbr = 8;
+        oExpiration_date = 9;
+        oCcv_code = 10;
+        oPostal_code = 11;
+        oSerial_nbr = 12;
+        oRouting_nbr = 13;
+        oState = 14;
+        oLicense_nbr = 15;
+        oBirth_date = 16;
+        oDisplay = 17;
+
+    // variables
+        var grid;
+        //var data = new Array("","","","","","","","",new Array(false,false,false,false,"","","","","","","","","","","","","","","","","","",""),"","","",true,true);
+        var data = [];
+
+        var grid2;
+        var data2 = [];
+
+        var gridCust;
+        var dataCust = [];
+
+        var gridShipping;
+        var dataShipping = [];
+
+        var gridHistory;
+        var dataHistory = [];
+
+        var gridReturnReasons;
+        var dataReturnReasons = [];
+
+        var gridRequirements;
+        var dataRequirements = [];
+
+        var giftCardsGrid;
+
+        var total = 0.0;
+
+        var phoneOrderShip = false;
+        var phoneOrderPickup = false;
+        var phoneOrderCookie;
+
+        var CustomerNotes = '';
+        var OrderNotes = '';
+        var CurrentSchool = 'Atlanta International School';
+        var CurrentSchoolId = '521';
+        var CustomerSchool = '';
+        var CustomerSchoolId = '';
+        var CustomerNbr = '';
+        var CustomerID = '';
+
+        var additionalTenders = [];
+
+        var returnReasonCode = [];
+
+        isAddressFromPhoneNumber = false;
+        isShipFromPhoneNumber = false;
+        var isChangeApproved = false;
+        var isNoShipping = false;
+        var isRetrieveSuspended = true;
+
+        var isPhoneNumberError = false;
+
+        var currentButtonPage = 1;
+        var currentButtonData = '';
+
+        var addrs1Parsed = false;
+        var addrs2Parsed = false;
+        var saddrs1Parsed = false;
+        var saddrs2Parsed = false;
+        //var lastFindQuery = [];
+
+        // customer change
+        var is_downloaded_customer = false;
+        var c_international = false;
+        var c_residential = true;
+        var c_phone = '';
+        var c_altphone = '';
+        var c_lastName = '';
+        var c_firstName = '';
+        var c_address1 = '';
+        var c_address2 = '';
+        var c_city = '';
+        var c_state = '';
+        var c_zipCode = '';
+        var c_country = '';
+        var c_email = '';
+        var c_cschool = '';
+        var c_cschoolid = '';
+        var c_customerNotes = '';
+
+        var is_downloaded_shipto = false;
+        var c_shipinternational = false;
+        var c_sresidential = true;
+        var c_sphone = '';
+        var c_saltphone = '';
+        var c_slastName = '';
+        var c_sfirstName = '';
+        var c_saddress1 = '';
+        var c_saddress2 = '';
+        var c_scity = '';
+        var c_sstate = '';
+        var c_szipCode = '';
+        var c_scountry = '';
+        var c_semail = '';
+
+        // keeps track of where we are in the process of "finding" an item
+        //  0 - initial state - looking up category_groups
+        //  1 - a category_group has been selected, looking up categories
+        //  2 - a category has been selected, looking up products
+        //  3 - product has been selected, looking up styles
+        //  4 - style has been selected, looking up colors
+        //  5 - color has been selected, looking up sizes
+        //  6 - size has been selected, display skus
+
+        var findItemState = 0;
+        var targetTable = "";
+        var gender = "";
+        var grade = "";
+        var categories = [];
+        var products = [];
+        var styles = [];
+        var colors = [];
+        var sizes = [];
+        var skus = [];
+
+        var shortDays = [];
+        shortDays[0] = 'Sun';
+        shortDays[1] = 'Mon';
+        shortDays[2] = 'Tue';
+        shortDays[3] = 'Wed';
+        shortDays[4] = 'Thu';
+        shortDays[5] = 'Fri';
+        shortDays[6] = 'Sat';
+
+        var shortMonths = [];
+        shortMonths[0] = 'Jan';
+        shortMonths[1] = 'Feb';
+        shortMonths[2] = 'Mar';
+        shortMonths[3] = 'Apr';
+        shortMonths[4] = 'May';
+        shortMonths[5] = 'Jun';
+        shortMonths[6] = 'Jul';
+        shortMonths[7] = 'Aug';
+        shortMonths[8] = 'Sep';
+        shortMonths[9] = 'Oct';
+        shortMonths[10] = 'Nov';
+        shortMonths[11] = 'Dec';
+        
+
+        // examine keyboard keys when not in an editor
+        var blockedKeysArr = [
+            // allow tab (7), caps lock (20), page up (33), page down (34), end (35)
+            8,  // backspace - will go back a url
+            //13, // enter
+            18, // alt
+            19, // pause, break
+            27, // escape
+            36, // home
+            45, // insert
+            // function keys 1 (112) - 12 (123)
+            112, 113, 114, 115,
+            116, // F5
+            117, 118, 119, 120, 121,
+            122, // F11
+            123];
+
+        // define the grid columns
+        var columns = [
+        { id: "barcode", name: "Item", field: "barcode", width: 100, resizable: false, editor: Slick.Editors.Text, validator: requiredFieldValidator },
+        { id: "description", name: "Description", field: "description", width: 170, resizable: false },
+        { id: "quantity", name: "Quantity", field: "quantity", width: 54, resizable: false, cssClass: "cell-qty", editor: Slick.Editors.Integer, formatter: Slick.Formatters.Negative, validator: requiredFieldValidator },
+        { id: "price", name: "Price", field: "price", width: 54, resizable: false, cssClass: "cell-money", editor: Slick.Editors.Money, validator: requiredFieldValidator },
+        { id: "extended", name: "Extended", field: "extended", width: 64, resizable: false, cssClass: "cell-money" },
+        { id: "taxable", name: "Taxable", field: "taxable", width: 56, resizable: false, cssClass: "cell-effort-driven", formatter: Slick.Formatters.Checkmark, editor: Slick.Editors.Checkbox },
+        { id: "ship", name: "Ship", field: "ship", width: 43, resizable: false, cssClass: "cell-effort-driven", formatter: Slick.Formatters.Checkmark, editor: Slick.Editors.Checkbox },
+        { id: "pickup", name: "Pick Up", field: "pickup", width: 50, resizable: false, cssClass: "cell-effort-driven", formatter: Slick.Formatters.Checkmark, editor: Slick.Editors.Checkbox },
+        { id: "altspecial", name: "Alt/Special", field: "altspecial", width: 68, resizable: false, cssClass: "cell-effort-driven", formatter: Slick.Formatters.AltSpecial, editor: Slick.Editors.AltSpecial },
+        { id: "school", name: "School", field: "school", width: 120, resizable: false }
+        ];
+
+        var columns2 = [
+        { id: "orderdate", name: "Date", field: "orderdate", width: 179, resizable: false },
+        { id: "ordernote", name: "Note", field: "ordernote", width: 200, resizable: false },
+        { id: "orderguid", name: "Order", field: "orderguid", width: 300, resizable: false },
+        { id: "custname", name: "Customer", field: "custname", width: 200, resizable: false }
+        ];
+
+        var columnsCustomer = [
+        { id: "custLastName", name: "Last Name", field: "custLastName", width: 200, resizable: false },
+        { id: "custFirstName", name: "First Name", field: "custFirstName", width: 140, resizable: false },
+        { id: "custAddress1", name: "Address", field: "custAddress1", width: 300, resizable: false },
+        { id: "custCity", name: "City", field: "custCity", width: 200, resizable: false },
+        { id: "custState", name: "State", field: "custState", width: 60, resizable: false }
+        ];
+
+        var columnsHistory = [
+        { id: "historyDate", name: "Date", field: "historyDate", width: 119, resizable: false },
+        { id: "historyStore", name: "Store", field: "historyStore", width: 120, resizable: false },
+        { id: "historySupplier", name: "Brand", field: "historySupplier", width: 50, resizable: false },
+        { id: "historyStyle", name: "Style", field: "historyStyle", width: 100, resizable: false },
+        { id: "historyColor", name: "Color", field: "historyColor", width: 70, resizable: false },
+        { id: "historySize", name: "Size", field: "historySize", width: 100, resizable: false },
+        { id: "historyVariance", name: "Other", field: "historyVariance", width: 50, resizable: false },
+        { id: "historyDescription", name: "Description", field: "historyDescription", width: 230, resizable: false },
+        { id: "historyQuantity", name: "Qty", field: "historyQuantity", width: 40, resizable: false }
+        ]
+
+        var columnsRequirements = [
+        { id: "reqCategory", name: "Category", field: "reqCategory", width: 119, resizable: false },
+        { id: "reqProduct", name: "Product", field: "reqProduct", width: 120, resizable: false },
+        { id: "reqStyle", name: "Style", field: "reqStyle", width: 260, resizable: false },
+        { id: "reqColor", name: "Color", field: "reqColor", width: 100, resizable: false },
+        { id: "reqNotes", name: "Notes", field: "reqNotes", width: 300, resizable: false },
+        ]
+
+        var columnsReturnReasons = [
+        { id: "rtnReason", name: "Return Reason", field: "rtnReason", width: 900, resizable: false },
+        ]
+
+        var columnsGiftCards = [
+        { id: "oGrid", name: "Amount", field: "oGrid", width: 299, resizable: false, cssClass: "cell-money-offset" },
+        { id: "oAccount_nbrID", name: "Gift Card Number", field: "oAccount_nbr", width: 600, resizable: false }
+        ]
+        // define the grid optionss
+        var options = {
+            editable: true,
+            autoEdit: true,
+
+            enableAddRow: true,
+            enableCellNavigation: true,
+            multiSelect: false,
+            enableColumnReorder: false,
+            asyncEditorLoading: false
+        };
+
+        var options2 = {
+            editable: false,
+            autoEdit: false,
+
+            enableAddRow: false,
+            enableCellNavigation: true,
+            multiSelect: false,
+            enableColumnReorder: false,
+            asyncEditorLoading: false
+        }
+        </script>
+    <!-- Startup (ready) function -->
+    <script type="text/javascript">
+        $(function () {
+            Date.format = 'mm/dd/yyyy';
+            $('.date-pick').datePicker().val(new Date().asString()).trigger('change');
+            phoneOrderCookie = readCookie('POS_PhoneOrder');
+            if (phoneOrderCookie == 'true') {
+                $('body').css('background', 'skyblue');
+                $('#header').css('background', 'dodgerblue');
+                $('#header').css('color', 'white');
+                $('#headerMessage').text('Phone Order');
+                var confirm = createPopupDialog('ConfirmationBox.html', 'Ship the Item?');
+                if (confirm == 'Yes') {
+                    phoneOrderShip = true;
+                } else {
+                    phoneOrderPickup = true;
+                }
+            }
+           
+// remove for production
+            for (var i = 0; i < 40; i++) {
+                var qty = Math.round(Math.random() * 3) + 1;
+                var prc = Math.round(Math.random() * 1000) / 100;
+                var d = (data[i] = {});
+                var a = [];
+                d["id"] = i;
+                d["skuid"] = Math.round(Math.random() * 100000);
+                d["barcode"] = "258/" + i;
+                d["description"] = "Shirt, SS, Pique";
+                d["quantity"] = qty;
+                d["price"] = prc.formatMoney(2, "");
+                d["extended"] = (qty * prc).formatMoney(2, "");
+                d["taxable"] = true;
+                d["ship"] = phoneOrderShip;
+                d["pickup"] = phoneOrderPickup;
+                
+                a['AlterLength'] = false;
+                a['AlterWaist'] = false;
+                a['AlterBoth'] = false;
+                a['Special'] = false;
+                a['Personalization'] = "";
+                a['Neck'] = "";
+                a['Chest'] = "";
+                a['Sleeve'] = "";
+                a['Crotch'] = "";
+                a['Waist'] = "";
+                a['Inseam'] = "";
+                a['BackWaist'] = "";
+                a['FinishedLength'] = "";
+                a['Bust'] = "";
+                a['UnderBust'] = "";
+                a['Hip'] = "";
+                a['Head'] = "";
+                a['Height'] = "";
+                a['Weight'] = "";
+                a['Notes'] = "";
+
+                d["altspecial"] = a;
+                d["school"] = CurrentSchool;
+                d["schoolID"] = CurrentSchoolId;
+                d["gender"] = "";
+                d["grade"] = "";
+                d["originalID"] = d["skuid"];
+                d["original_price"] = d["price"];
+                d["permanent_price"] = d["price"];
+                d["is_taxable"] = true;
+                d["is_discountable"] = true;
+                d["return_reason_code"] = "";
+            }
+
+// ========================
+
+            grid = new Slick.Grid("#myGrid", data, columns, options);
+            grid.setSelectionModel(new Slick.RowSelectionModel());
+            grid2 = new Slick.Grid("#getDataGrid", data2, columns2, options2);
+            grid2.setSelectionModel(new Slick.RowSelectionModel());
+            gridCust = new Slick.Grid("#getCustomerGrid", dataCust, columnsCustomer, options2);
+            gridCust.setSelectionModel(new Slick.RowSelectionModel());
+            gridShipping = new Slick.Grid("#getShippingGrid", dataShipping, columnsCustomer, options2);
+            gridShipping.setSelectionModel(new Slick.RowSelectionModel());
+            gridHistory = new Slick.Grid('#getHistoryGrid', dataHistory, columnsHistory, options2);
+            gridHistory.setSelectionModel(new Slick.RowSelectionModel());
+            gridReturnReasons = new Slick.Grid('#returnReasonsGrid', dataReturnReasons, columnsReturnReasons, options2);
+            gridReturnReasons.setSelectionModel(new Slick.RowSelectionModel());
+            gridRequirements = new Slick.Grid('#getRequirementsGrid', dataRequirements, columnsRequirements, options2);
+            gridRequirements.setSelectionModel(new Slick.RowSelectionModel());
+            gridGCards = new Slick.Grid('#giftCardsGrid', additionalTenders, columnsGiftCards, options2);
+            gridGCards.setSelectionModel(new Slick.RowSelectionModel());
+
+            // get return reasons from db and fill dataReturnReasons then:
+            dataReturnReasons[0] = new Array();
+            dataReturnReasons[0]['rtnReason'] = 'Defective Merchandise';
+            dataReturnReasons[0]['id'] = 123;
+            dataReturnReasons[1] = new Array();
+            dataReturnReasons[1]['rtnReason'] = 'Wrong Size';
+            dataReturnReasons[1]['id'] = 124;
+            gridReturnReasons.invalidate();
+            gridReturnReasons.render();
+            gridReturnReasons.setSelectedRows([0, 0]);
+
+            sumExtendedPrice();
+            //grid.gotoCell(0,0,false)
+            grid.gotoCell(data.length, 0, false);
+            $('#phone').focus();
+
+            $('#giftCard').bind("contextmenu", function (e) {
+                // see if they want to manage gift cards
+                if (additionalTenders.length > 0) {
+                    manageGiftCards();
+                }
+                e.preventDefault();
+            });
+            $('#sidebar-left').bind("contextmenu", function (e) {
+                e.preventDefault();
+            });
+            $('#header').bind("contextmenu", function (e) {
+                e.preventDefault();
+            });
+            $('#content').bind("contextmenu", function (e) {
+                e.preventDefault();
+            });
+
+            // new row is just being added to the grid (new barcode)
+            grid.onAddNewRow.subscribe(function (e, args) {
+                var item = args.item;
+                grid.invalidateRow(data.length);
+                getSkuInformation(item.barcode);
+                if (!($('#btnReturn').css('background-color') == 'silver' || $('#btnReturn').css('background-color') == '#c0c0c0' || $('#btnReturn').css('background-color') == 'rgb(192, 192, 192)')) {
+                    $('#form1').hide();
+                    $('#returnReasons').show();
+                }
+                grid.updateRowCount();
+                grid.render();
+                grid.gotoCell(data.length, 0, false);
+            });
+
+            // handle changes to existing rows
+            grid.onCellChange.subscribe(function (e, args) {
+                // 2 is quantity, 3 is price
+                if (args.cell == 2 || args.cell == 3) {
+                    if (!isChangeApproved && args.cell == 3) {
+                        isChangeApproved = createPopupDialog('SupervisorOverride.html');
+                    }
+                    if (args.cell == 3) {
+                        if (!isChangeApproved) {
+                            data[args.row]["price"] = data[args.row]["original_price"];
+                        } else {
+                            if (toFixed(data[args.row]["price"], 2) > 0) {
+                                var confirm = createPopupDialog('ConfirmationBox.html', 'Did You Enter a Percentage Discount?');
+                                if (confirm == 'Yes') {
+                                    var amt = toFixed(data[args.row]["price"], 0);
+                                    if (amt > 0 && amt <= 100) {
+                                        data[args.row]["price"] = (data[args.row]["permanent_price"] * (100 - data[args.row]["price"]) / 100).formatMoney(2, "");
+                                    } else {
+                                        showMsg('Error - discount out of range.\nMust be between 0 and 100%.');
+                                        data[args.row]["price"] = data[args.row]["original_price"];
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    var qty = toFixed(data[args.row]["quantity"], 0);
+                    if (qty == 0) {
+                        data.splice(args.row, 1);
+                        grid.invalidate();
+                    } else {
+                        if (data[args.row]["extended"] < 0 && qty > 0) {
+                            qty = -1 * qty;
+                            data[args.row]["quantity"] = qty;
+                        }
+                        if (data[args.row]["extended"] > 0 && qty < 0) {
+                            qty = -1 * qty;
+                            data[args.row]["quantity"] = qty;
+                        }
+                        var prc = toFixed(data[args.row]["price"], 2);
+                        data[args.row]["extended"] = (qty * prc).formatMoney(2, "");
+                        grid.updateRow(args.row);
+                    }
+                    sumExtendedPrice();
+                }
+                grid.gotoCell(args.row, 0, false);
+            });
+
+            // handle delete by presenting a menu
+            grid.onContextMenu.subscribe(function (e) {
+                e.preventDefault();
+                //grid.resetActiveCell();
+                var cell = grid.getCellFromEvent(e);
+                grid.setSelectedRows([cell.row, cell.row]);
+                $("#contextMenu")
+                    .data("row", cell.row)
+                    .css("top", e.pageY)
+                    .css("left", 300)
+                    .show();
+
+                $("body").one("click", function () {
+                    $("#contextMenu").hide();
+                });
+            });
+
+            // handle checkboxes
+            grid.onClick.subscribe(function (e, args) {
+                switch (args.cell) {
+                    case 5:
+                        // taxable
+                        if (!isChangeApproved) {
+                            isChangeApproved = createPopupDialog('SupervisorOverride.html', '');
+                        }
+                        e.stopImmediatePropagation();
+                        if (isChangeApproved == true) {
+                            if (data[args.row]["taxable"] == "checked" || data[args.row]["taxable"] == true) {
+                                data[args.row]["taxable"] = false;
+                            } else {
+                                data[args.row]["taxable"] = "checked";
+                            }
+                            grid.updateRow(args.row);
+                        }
+                        break;
+                    case 6:
+                        // ship
+                        e.stopImmediatePropagation();
+                        if (data[args.row]["ship"] == "checked" || data[args.row]["ship"] == true) {
+                            data[args.row]["ship"] = false;
+                        } else {
+                            data[args.row]["ship"] = "checked";
+                            data[args.row]["pickup"] = false;
+                        }
+                        grid.updateRow(args.row);
+                        break;
+                    case 7:
+                        // pickup
+                        e.stopImmediatePropagation();
+                        if (data[args.row]["pickup"] == "checked" || data[args.row]["pickup"] == true) {
+                            data[args.row]["pickup"] = false;
+                        } else {
+                            data[args.row]["pickup"] = "checked";
+                            data[args.row]["ship"] = false;
+                        }
+                        grid.updateRow(args.row);
+                        break;
+                }
+                sumExtendedPrice();
+            });
+
+            grid2.onDblClick.subscribe(function (e, args) {
+                $('#getDataSelect').trigger('click');
+            });
+            gridCust.onDblClick.subscribe(function (e, args) {
+                $('#getCustomerSelect').trigger('click');
+            });
+            gridReturnReasons.onDblClick.subscribe(function (e, args) {
+                $('#returnReasonsSelect').trigger('click');
+            });
+
+            //Handle hover boxes
+            //http://tuljo.com/web-development/tooltip-koteako-hoverbox
+            //$('#phone').hoverbox();
+            //$('#phonelabel').hoverbox();
+            //$('#sphone').hoverbox();
+            //$('#sphonelabel').hoverbox();
+        });
+</script>
+    <!-- Page-specific Utility Javascript -->
+    <script type="text/javascript">
+        // keyboard
+        $('body').keydown(function (e) {
+            //see if we are processing a phone number
+            //var unicode = e.keyCode ? e.keyCode : e.charCode
+
+            if (e.altKey || e.ctrlKey) {
+                if (e.stopPropagation) e.stopPropagation();
+                if (e.preventDefault) e.preventDefault();
+                e.returnValue = false;
+                return false;
+            }
+
+            if ((e.target.id == 'phone') || (e.target.id == 'altphone')) {
+                var returnNumber = processPhone($('#international').prop("checked"), e);
+                if (returnNumber == 0) {
+                    $('#international').prop("checked", false)
+                } else if (returnNumber == 1) {
+                    $('#international').prop("checked", true)
+                }
+                //don't exit if cr or tab -- > 1
+                if (returnNumber < 2) {
+                    if (e.stopPropagation) e.stopPropagation();
+                    if (e.preventDefault) e.preventDefault();
+                    e.returnValue = false;
+                    e.target.focus();
+                    return false;
+                }
+            }
+
+            if ((e.target.id == 'sphone') || (e.target.id == 'saltphone')) {
+                var returnNumber = processPhone($('#shipinternational').prop("checked"), e);
+                if (returnNumber == 0) {
+                    $('#shipinternational').prop("checked", false)
+                } else if (returnNumber == 1) {
+                    $('#shipinternational').prop("checked", true)
+                }
+                //don't exit if cr or tab -- > 1
+                if (returnNumber < 2) {
+                    if (e.stopPropagation) e.stopPropagation();
+                    if (e.preventDefault) e.preventDefault();
+                    e.returnValue = false;
+                    e.target.focus();
+                    return false;
+                }
+            }
+
+            //adjust for keypad
+            if (e.which >= 96 && e.which <= 105) {
+                e.which -= 48;
+            }
+
+            //ignore TAB
+            if (e.which == 9 || e.which == 16) {
+                return true;
+            }
+
+            //adjust for CR or arrow down or page down
+            if (e.which == 13 || e.which == 40 || e.which == 34) {
+                if (e.target.type == 'textarea') { return true; }
+                var x = document.getElementsByTagName("input");
+                for (var i = 0; i < x.length; i++) {
+                    if (e.target.id == x[i].id && i < x.length - 1) {
+                        if (x[i + 1].type == "text") {
+                            $('#' + x[i + 1].id).focus();
+                            break;
+                        } else if (i <= 27 && x[i + 4].type == "text") {
+                            $('#' + x[i + 4].id).focus();
+                            break;
+                        } else { break; }
+                    }
+                }
+                return false;
+            }
+
+            //adjust for arrow up or page up
+            if (e.which == 33 || e.which == 38) {
+                if (e.target.type == 'textarea') { return true; }
+                var x = document.getElementsByTagName("input");
+                for (var i = 0; i < x.length; i++) {
+                    if (e.target.id == x[i].id && i < x.length) {
+                        if (i >= 1 && x[i - 1].type == "text") {
+                            $('#' + x[i - 1].id).focus();
+                            break;
+                        } else if (i >= 4 && x[i - 4].type == "text" && x[i - 4].id != "") {
+                            $('#' + x[i - 4].id).focus();
+                            break;
+                        } else { break; }
+                    }
+                }
+                return false;
+            }
+
+            //test for delete key
+            if (e.which == 46) {
+                if (e.target.className == 'editor-text') {
+                    // in the grid - delete the selected row
+                    var selectedRow = grid.getSelectedRows()[0];
+                    if (!selectedRow.length || $.inArray(dd.row, selectedRow) == -1) {
+                        grid.setSelectedRows(selectedRow);
+                        data.splice(selectedRow, 1);
+                        grid.invalidate();
+                    }
+                    sumExtendedPrice();
+                    grid.gotoCell(data.length, 0, false);
+                    return false;
+                } else {
+                    // pass the delete through
+                    return true;
+                }
+
+            }
+            else if ((e.target.type == 'text' || e.target.type == 'textarea') && e.which == 8) {
+                    // pass backspace to form if text type input
+                return true;
+            }
+            else if ((e.target.type == 'text' || e.target.type == 'textarea') && e.which == 27) {
+                    // pass backspace to form if text type input
+                e.target.value = '';
+                if (e.target.className == 'editor-text') {
+                    grid.gotoCell(data.length, 0, false);
+                }
+                return false;
+            }
+            else {
+                // review other codes to see if they should be blocked
+                for (var t = 0; t < blockedKeysArr.length; t++) {
+                    if (e.which == blockedKeysArr[t]) {
+                        //alert("Key Code: " + window.event.keyCode + " This action is not allowed");
+                        if (e.which != 16 && e.which != 17) {
+                            window.event.keyCode = 503;
+                        }; //shift, control
+                        if (e.stopPropagation) e.stopPropagation();
+                        if (e.preventDefault) e.preventDefault();
+                        return false;
+                    }
+                }
+                if (e.target.id == 'vchgamt') {
+                    if (e.which != 110 & e.which != 190 && (e.which < 48 || e.which > 57)) { return false };
+                }
+                return true;
+            }
+        });
+
+        // handle delete
+        $("#contextMenu").click(function (e) {
+            if (!$(e.target).is("li")) {
+                return;
+            }
+            if (e.target.id != "delete") {
+                return;
+            }
+
+            var selectedRow = $(this).data("row");
+            if (data.length <= 0 || selectedRow >= data.length) {
+                return;
+            }
+
+            grid.setSelectedRows(selectedRow);
+            data.splice(selectedRow, 1);
+            grid.setData(data);
+            grid.invalidate();
+            grid.render();
+            sumExtendedPrice();
+            grid.gotoCell(data.length, 0, false);
+        });
+
+        // handle return reasons
+        $('#exitReturnReasons').click(function () {
+            var selectedRow = data.length - 1;
+            grid.setSelectedRows(selectedRow);
+            data.splice(selectedRow, 1);
+            grid.setData(data);
+            grid.invalidate();
+            grid.render();
+            sumExtendedPrice();
+            $('#returnReasons').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+        $('#returnReasonsSelect').click(function (e) {
+            var reasonRow = gridReturnReasons.getSelectedRows();
+            data[data.length - 1]['return_reason_code'] = dataReturnReasons[reasonRow[0]]['id'];
+            $('#returnReasons').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+
+        // handle schools basics
+        $('#bschool').click(function () {
+            $('#bschool').val('');
+        });
+        $('#bschool').blur(function () {
+            if ($('#bschool').val() == "") { $('#bschool').val(CurrentSchool) }
+        });
+        $('#cschool').click(function () {
+            $('#cschool').val('');
+        });
+        $('#cschool').blur(function () {
+            if ($('#cschool').val() == "") { $('#cschool').val(CustomerSchool) }
+        });
+
+        // show and hide the message box
+        function showMsg(msg) {
+            $('#msgText').text(msg);
+            $('#msgBox').show();
+            $('#_msgBox').show();
+        };
+        $('#btnMsgOK').click(function () {
+            $('#_msgBox').hide();
+            $('#msgBox').hide();
+            $('#form1').show();
+            if (isPhoneNumberError = true) {
+                isPhoneNumberError = false;
+                $('#phone').focus();
+            }
+        });
+
+        $('#requirements').click(function () {
+            if (CurrentSchool = '') { return };
+
+            var req = (dataRequirements[0] = {});
+            req['reqCategory'] = 'Knit Shirts'
+            req['reqProduct'] = 'Short Sleeve Adult Jersey (smooth)'
+            req['reqStyle'] = 'SHIRT-T-NECK 50/50-YTH'
+            req['reqColor'] = 'WHITE'
+            req['reqNotes'] = 'Logo or Monogram is required'
+
+            gridRequirements.invalidate();
+            gridRequirements.render();
+
+            $('#form1').hide();
+            $('#getRequirementsMessage').text(CurrentSchool);
+            $('#getRequirements').show();
+        });
+        $('#exitRequirements, #doneRequirements').click(function () {
+            $('#getRequirements').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+
+        $('#btnHistory').click(function () {
+            if (testCustomer() == false) { return };
+            var dtVar = Math.round(Math.random() * 10);
+            var mDate = new Date();
+            mDate.setDate(mDate.getDate() - dtVar);
+            var dh = (dataHistory[0] = {});
+            var sDate = shortDays[mDate.getDay()] + ', ' + shortMonths[mDate.getMonth()] + ' ' + mDate.getDate() + ', ' + mDate.getFullYear();
+            dh['historyDate'] = sDate;
+            dh['historyStore'] = 'Sandy Springs';
+            dh['historySupplier'] = 'PSU';
+            dh['historyStyle'] = '7200';
+            dh['historyColor'] = 'KHA';
+            dh['historySize'] = '6XR';
+            dh['historyVariance'] = '';
+            dh['historyDescription'] = 'SLACKS, GIRLS, ELAS';
+            dh['historyQuantity'] = '2';
+
+            var dh = (dataHistory[1] = {});
+            dh['historyDate'] = sDate;
+            dh['historyStore'] = 'Sandy Springs';
+            dh['historySupplier'] = 'PSU';
+            dh['historyStyle'] = '6000';
+            dh['historyColor'] = 'NVY';
+            dh['historySize'] = 'YM';
+            dh['historyVariance'] = '';
+            dh['historyDescription'] = 'CARDIGAN, CREWNECK';
+            dh['historyQuantity'] = '1';
+
+            gridHistory.invalidate();
+            gridHistory.render();
+
+            $('#form1').hide();
+            $('#getHistoryMessage').text('History');
+            $('#getHistory').show();
+        });
+        $('#exitHistory, #doneHistory').click(function () {
+            $('#getHistory').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+
+        $('#btnClearCustomer').click(function () {
+            clearCustomer();
+        });
+
+        // Customer Notes
+        $('#btnCustomerNotes').click(function () {
+            if (testCustomer() == false) { return };
+            $('#notesArea').text(CustomerNotes);
+            $('#form1').hide();
+            $('#CustomerNotes').show();
+        });
+        $('#updateCustomerNotes').click(function () {
+            CustomerNotes = $('#notesArea').text();
+            $('#CustomerNotes').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+        $('#exitCustomerNotes').click(function () {
+            $('#notesArea').text('')
+            $('#CustomerNotes').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+
+        // Save Customer
+        $('#btnSaveCustomer').click(function () {
+            if (testCustomer() == false) { return }
+            // update or add customer
+            if (changedCustomer()) {
+                if (is_downloaded_customer) {
+                    // we have customer id
+
+                } else {
+                    // create new customer id
+
+                }
+                // need to update compare variables as if downloaded
+            }
+            if (changedShipTo()) {
+                if (is_downloaded_shipto) {
+
+                } else {
+
+                }
+                // need to update compare variables as if downloaded
+            }
+        });
+
+        // Order Notes
+        $('#btnOrderNotes').click(function () {
+            if (testCustomer() == false) { return };
+            $('#oNotesArea').text(OrderNotes);
+            $('#form1').hide();
+            $('#OrderNotes').show();
+        });
+        $('#updateOrderNotes').click(function () {
+            OrderNotes = $('#oNotesArea').text();
+            $('#OrderNotes').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+        $('#exitOrderNotes').click(function () {
+            $('#oNotesArea').text('')
+            $('#OrderNotes').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+
+        // Complete phone number?
+        $('#phone').blur(function () {
+            setTimeout(function () {
+                if (testPhoneNumbers('phone', 'phonelabel')) {
+                    if ($('#altphone').val().length >= 12 && $('#phone').val().length == 0) {
+                        showMsg('You must have a primary phone number.');
+                        $('#phone').focus();
+                    } else if ($('#phone').val().length >= 12 && is_downloaded_customer == false) {
+                        // get both forms - test "phone" and "fax" without and with dashes
+                        dataCust.length = 0;
+                        getCustomer($('#phone').val(), false, false);
+                        getCustomer($('#phone').val(), false, true);
+                        getCustomer($('#phone').val(), true, false);
+                        getCustomer($('#phone').val(), true, true);
+                        gridCust.invalidate();
+                        gridCust.render();
+                        $('#form1').hide();
+                        $('#getCustomerMessage').text($('#phone').val());
+                        $('#getCustomer').show();
+                    }
+                }
+
+            }, 100);
+        });
+        $('#exitGetCustomer, #getCustomerNone').click(function () {
+            $('#getCustomer').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+        $('#getCustomerSelect').click(function () {
+            var custRow = gridCust.getSelectedRows();
+            is_downloaded_customer = true;
+
+            c_altphone = '';
+            c_customerNotes = '';
+            if (dataCust[custRow[0]]['custRes'] == true) {
+                c_residential == true;
+                $('#residential').prop('checked','checked');
+            } else {
+                c_residential == false;
+                $('#business').prop('checked','checked');
+            }
+            c_lastName = dataCust[custRow[0]]['custLastName'];
+            $('#lastName').val(c_lastName);
+            c_firstName = dataCust[custRow[0]]['custFirstName'];
+            $('#firstName').val(c_firstName);
+            c_address1 = dataCust[custRow[0]]['custAddress1'];
+            $('#address1').val(c_address1);
+            c_address2 = dataCust[custRow[0]]['custAddress2'];
+            $('#address2').val(c_address2);
+            c_city = dataCust[custRow[0]]['custCity'];
+            $('#city').val(c_city);
+            c_state = dataCust[custRow[0]]['custState'];
+            $('#state').val(c_state);
+            c_zipCode = dataCust[custRow[0]]['custZip'];
+            $('#zipCode').val(c_zipCode);
+            c_country = dataCust[custRow[0]]['custCountry'];
+            $('#country').val(c_country);
+            c_phone = dataCust[custRow[0]]['custPhone1'];
+            $('#phone').val(c_phone);
+            c_email = dataCust[custRow[0]]['custEmail'];
+            $('#email').val(c_email);
+            CustomerNbr = dataCust[custRow[0]]['custNbr'];
+            CustomerID = dataCust[custRow[0]]['custID'];
+            c_cschool = "";
+            //c_cschool = dataCust[custRow[0]]['custSchool'];
+            $('#cschool').val(c_cschool);
+            $('#bschool').val(c_cschool);
+            CurrentSchool = c_cschool;
+            CustomerSchool = c_cschool;
+            c_cschoolid = "";
+            //c_cschoolid = dataCust[custRow[0]]['custSchoolId'];
+            CurrentSchoolId = c_cschoolid;
+            CustomerSchoolId = c_cschoolid;
+            
+            //getCustomerShipping(CustomerID);
+            getCustomerSchool(CustomerID);
+            $('#getCustomer').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+        $('#altphone').blur(function () {
+            if (testPhoneNumbers('altphone', 'altphonelabel') && $('#altphone').val().length >= 12 && $('#phone').val().length == 0) {
+                showMsg('You must have a primary phone number.');
+                $('#phone').focus();
+            }
+        });
+
+        // Complete shipping phone number?
+        $('#sphone').blur(function () {
+            if (testPhoneNumbers('sphone', 'sphonelabel') && $('#saltphone').val().length >= 12 && $('#sphone').val().length == 0) {
+                showMsg('You must have a primary phone number.');
+                $('#sphone').focus();
+            }
+        });
+        $('#saltphone').blur(function () {
+            if (testPhoneNumbers('saltphone', 'saltphonelabel') && $('#saltphone').val().length >= 12 && $('#sphone').val().length == 0) {
+                showMsg('You must have a primary phone number.');
+                $('#sphone').focus();
+            }
+        });
+
+        // test phone numbers
+        function testPhoneNumbers(oPhone, oLabel) {
+            var oCurrent = $('#' + oPhone).val().length;
+
+            if ($('#international').prop("checked") == true) {
+                $('#' + oLabel).css('color', 'black');
+                return true;
+            }
+            // test if empty or complete
+            if ((oCurrent == 0) || (oCurrent >= 12)) {
+                // yes, done
+                $('#' + oLabel).css('color', 'black');
+                return true;
+            }
+
+            // error message
+            $('#' + oLabel).css('color', 'red');
+            showMsg('Please correct the phone number.');
+            setTimeout(function () {
+                $('#' + oPhone).focus();
+            }, 100);
+            cursorAtEnd(oPhone);
+            return false;
+        };
+
+        // put cursor at the end
+        function cursorAtEnd(id) {
+            var elem = document.getElementById(id);
+            var caretPos = $('#' + id).val().length;
+            if (elem.createTextRange) {
+                //IE
+                var range = elem.createTextRange();
+                range.move('character', caretPos);
+                range.select();
+            }
+            else {
+                //other
+                if (elem.selectionStart) {
+                    elem.focus();
+                    elem.setSelectionRange(caretPos, caretPos);
+                }
+                else
+                    elem.focus();
+            }
+        };
+
+        // Find an Item
+        $("#findItem").click(function () {
+            findItemState = 0;
+            categories.length = 0;
+            products.length = 0;
+            styles.length = 0;
+            colors.length = 0;
+            sizes.length = 0;
+            skus.length = 0;
+            currentButtonPage = 1;
+            //lastFindQuery = [];
+
+            //targetTable = "UniformProduct";
+            targetTable = "Category";
+            // open Category, Product, Style, Colors, Sizes
+            // target, page, column, guid, school, gender, grade, sort
+            if ($('#gradesComboBox').val() == 'all' || CurrentSchool == '') {
+                findItemModelData(targetTable, '', '', '', '', '', '', true);
+            } else {
+                findItemModelData(targetTable, '', '', '', CurrentSchoolId, $('#male').prop('checked') ? 'MALE' : 'FEMALE', $('#gradesComboBox').val(), true);
+            }
+        });
+
+        $('#selectItemExit').click(function() {
+            clearFindItemFunction();
+        });
+
+        $('#btnBack').click(function () {
+            if (currentButtonPage > 1) {
+                currentButtonPage -= 1
+                displayButtons(currentButtonData);
+                return;
+            }
+
+            if (findItemState == 1) {
+                clearFindItemFunction();
+            } else {
+                clearFindButtons();
+                switch (findItemState) {
+                    case 2: //displaying products
+                        products.length = 0;
+                        $('#findItemMessage').text('Categories');
+                        buttonData = categories;
+                        break;
+                    case 3: //displaying styles
+                        styles.length = 0;
+                        $('#findItemMessage').text('Products');
+                        buttonData = products;
+                        break;
+                    case 4: //displaying colors
+                        colors.length = 0;
+                        $('#findItemMessage').text('Styles');
+                        buttonData = styles;
+                        break;
+                    case 5: //displaying sizes
+                        sizes.length = 0;
+                        $('#findItemMessage').text('Colors');
+                        buttonData = colors;
+                        break;
+                    case 6:  //displaying skus
+                        skus.length = 0;
+                        $('#findItemMessage').text('Sizes');
+                        buttonData = sizes;
+                }
+                displayButtons(buttonData);
+                findItemState -= 1;
+            }
+        });
+
+        function clearFindItemFunction() {
+            findItemState = 0;
+            categories.length = 0;
+            products.length = 0;
+            styles.length = 0;
+            colors.length = 0;
+            sizes.length = 0;
+            skus.length = 0;
+            currentButtonPage = 1;
+            //lastFindQuery = [];
+            $('#selectItem').hide();
+            clearFindButtons();
+        }
+        function clearFindButtons() {
+            for (i = 0; i < 42; i++) {
+                $('#b' + i)[0].innerHTML = '';
+                $('#b' + i).hide();
+            }
+            $('#btnMore').hide();
+        };
+
+        // Find an Item - next stage
+        $('.sbuttons').click(function (e) {
+            var guid = "";
+            //lastFindQuery = [];
+            switch (findItemState) {
+                // target, page, column, guid, school, gender, grade, sort
+                case 1: //products
+                    guid = categories[e.target.id.substring(1)][0];
+                    findItemModelData('Product', '', 'category_id', guid, CurrentSchool, gender, grade, true);
+                    break;
+                case 2: //styles
+                    guid = products[e.target.id.substring(1)][0];
+                    findItemModelData('Style', '', 'product_id', guid, CurrentSchool, gender, grade, true);
+                    break;
+                case 3: //colors
+                    guid = styles[e.target.id.substring(1)][0];
+                    findItemModelData('StyleColor', '', 'style_id', guid, CurrentSchool, gender, grade, true);
+                    break;
+                case 4: //sizes
+                    guid = colors[e.target.id.substring(1)][0];
+                    findItemModelData('StyleColorSize', '', 'style_color_id', guid, CurrentSchool, gender, grade, true);
+                    break;
+                case 5: //skus
+                    guid = sizes[e.target.id.substring(1)][0];
+                    findItemModelData('Sku', '', 'style_color_size_id', guid, CurrentSchool, gender, grade, true);
+                    break;
+                case 6: // item selected - fill in
+
+
+            }
+        });
+        $('#btnMore').click(function (e) {
+            displayButtons(currentButtonData);
+        });
+
+        // Add-ons
+        $('#heatApplied').click(function () {
+            var selectedRow = grid.getSelectedRows()[0];
+            if (selectedRow < 0 || data.length <= 0 || selectedRow >= data.length) { return }
+            if (data[selectedRow]['description'].indexOf('- Logoed') >= 0) { return }
+            if (data[selectedRow]['description'].indexOf('- Monogrammed') >= 0) { return }
+            if (data[selectedRow]['description'].indexOf('- Sewn') >= 0) { return }
+            //create workorder, keep track of original to reduce inventory, changed adds
+            changeSku('65232', 'Logoed', 1.5);
+        });
+
+        $('#embroidered').click(function () {
+            var selectedRow = grid.getSelectedRows()[0];
+            if (selectedRow < 0 || data.length <= 0 || selectedRow >= data.length) { return }
+            if (data[selectedRow]['description'].indexOf('- Logoed') >= 0) { return }
+            if (data[selectedRow]['description'].indexOf('- Monogrammed') >= 0) { return }
+            if (data[selectedRow]['description'].indexOf('- Sewn') >= 0) { return }
+
+            $('#hs0')[0].innerHTML = 'Atlanta International A';
+            $('#hs0').show();
+            var ht = $('#hs0')[0].outerHTML;
+            ht = ht.replace('</button>', '<img class="htimg" src="Images/Atlanta International jacket.jpg" width="100" height="68" /></button>');
+            $('#hs0')[0].outerHTML = ht;
+
+            $('#hs1')[0].innerHTML = 'Atlanta International B';
+            $('#hs1').show();
+            ht = $('#hs1')[0].outerHTML;
+            ht = ht.replace('</button>', '<img class="htimg" src="Images/Atlanta International School.jpg" width="80" height="100" /></button>');
+            $('#hs1')[0].outerHTML = ht;
+
+            $('#btnHSSmore').hide();
+            $('#selectHSSMessage').text(CurrentSchool);
+            $('#selectHSS').show();
+        });
+
+        $('#sewn').click(function () {
+            var selectedRow = grid.getSelectedRows()[0];
+            if (selectedRow < 0 || data.length <= 0 || selectedRow >= data.length) { return }
+            if (data[selectedRow]['description'].indexOf('- Logoed') >= 0) { return }
+            if (data[selectedRow]['description'].indexOf('- Monogrammed') >= 0) { return }
+            if (data[selectedRow]['description'].indexOf('- Sewn') >= 0) { return }
+
+            //create workorder, keep track of original to reduce inventory, changed adds
+            changeSku('5729007', 'Sewn', 4);
+        });
+        
+        $('#selectHSSexit, #btnHSSback').click(function () {
+            clearSelectHSS();
+        });
+        function clearSelectHSS() {
+            $('#selectHSS').hide();
+            clearHSSbuttons();
+        };
+        function clearHSSbuttons() {
+            for (i = 0; i < 24; i++) {
+                $('#hs' + i)[0].innerHTML = '';
+                $('#hs' + i).hide();
+            }
+            $('#btnHSSmore').hide();
+        };
+        $('.hbuttons').click(function (e) {
+            //create workorder, keep track of original to reduce inventory, changed adds
+            changeSku('78426','Monogrammed',5);
+        });
+        $('#selectHSS').mousedown(function (e) {
+            if (e.target.type == 'button' && e.target.id.indexOf('hs') >= 0) {
+                //create workorder, keep track of original to reduce inventory, changed adds
+                changeSku('78426', 'Monogrammed', 5);
+                return false;
+            }
+            return true;
+        });
+        function changeSku(barcode, descrip, adder) {
+            clearSelectHSS();
+            var selectedRow = grid.getSelectedRows()[0];
+            if (selectedRow < 0 || data.length <= 0 || selectedRow >= data.length) { return }
+
+            grid.setSelectedRows(selectedRow);
+            data[selectedRow]['barcode'] = barcode;
+            data[selectedRow]['description'] = data[selectedRow]['description'] + ' - ' + descrip;
+
+            var qty = toFixed(data[selectedRow]["quantity"], 0);
+            var prc = parseFloat(data[selectedRow]['price'].replace(",", "")) + adder;
+            data[selectedRow]["price"] = prc.formatMoney(2, "");
+            data[selectedRow]["extended"] = (qty * prc).formatMoney(2, "");
+            grid.updateRow(selectedRow);
+            sumExtendedPrice();
+            grid.gotoCell(data.length, 0, false);
+        }
+
+        // Gift Cards
+        $('#giftCard').click(function (e) {
+            $('#form1').hide();
+            $('#vchgamt').val('');
+            $('#gcard').val('');
+            $('#ProcessVoucher').show();
+            $('#vchgamt').focus();
+        });
+        $('#exitVoucher').click(function () {
+            $('#ProcessVoucher').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+        $('#btnVoucherDone').click(function () {
+            var storedOK = true;
+            // store card info
+            var addTendersPointer = additionalTenders.length;
+            if (storedOK) {
+                additionalTenders[addTendersPointer] = new Array();
+                additionalTenders[addTendersPointer]['oIs_credit_card'] = false;
+                additionalTenders[addTendersPointer]['oTenderid'] = 0; //voucher guid
+                additionalTenders[addTendersPointer]['oAmount'] = parseFloat($('#vchgamt').val().replace(",", ""));
+                additionalTenders[addTendersPointer]['oGrid'] = parseFloat($('#vchgamt').val().replace(",", "")).formatMoney(2);
+                additionalTenders[addTendersPointer]['oApproval_code'] = '';
+                additionalTenders[addTendersPointer]['oToken'] = '';
+                additionalTenders[addTendersPointer]['oGl_account_id'] = 0; //voucher gl
+                additionalTenders[addTendersPointer]['oAccount_holder'] = '';
+                additionalTenders[addTendersPointer]['oAccount_nbr'] = $('#gcard').val();
+                additionalTenders[addTendersPointer]['oExpiration_date'] = '';
+                additionalTenders[addTendersPointer]['oCcv_code'] = '';
+                additionalTenders[addTendersPointer]['oPostal_code'] = '';
+
+                additionalTenders[addTendersPointer]['oSerial_nbr'] = '';
+                additionalTenders[addTendersPointer]['oRouting_nbr'] = '';
+                additionalTenders[addTendersPointer]['oState'] = '';
+                additionalTenders[addTendersPointer]['oLicense_nbr'] = '';
+                additionalTenders[addTendersPointer]['oBirth_date'] = '';
+                additionalTenders[addTendersPointer]['oDisplay'] = 'Gift Card';
+            }
+
+            $('#ProcessVoucher').hide();
+            $('#form1').show();
+
+            sumExtendedPrice();
+            //grid.updateRowCount();
+            //grid.render();
+            grid.gotoCell(data.length, 0, false);
+        });
+
+        function manageGiftCards() {
+            gridGCards.invalidate();
+            gridGCards.render();
+            $('#form1').hide();
+            $('#manageGiftCards').show();
+            $('#giftCardsGrid').focus();
+            gridGCards.setSelectedRows([0]);
+        };
+        $('#exitManageGiftCards, #btnExitManageGiftCards').click(function () {
+            $('#manageGiftCards').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+        $('#deleteGiftCard').click(function () {
+            var selectedRow = gridGCards.getSelectedRows();
+            if (selectedRow < 0 || selectedRow == undefined) { return }
+            additionalTenders.splice(selectedRow, 1);
+            gridGCards.invalidate();
+            gridGCards.render();
+            sumExtendedPrice();
+            if (additionalTenders.length == 0) {
+                $('#manageGiftCards').hide();
+                $('#form1').show();
+                grid.gotoCell(data.length, 0, false);
+            }
+        });
+
+        $('#btnReturn').click(function () {
+            if ($('#btnReturn').css('background-color') == 'silver' || $('#btnReturn').css('background-color') == '#c0c0c0' || $('#btnReturn').css('background-color') == 'rgb(192, 192, 192)') {
+                $('#btnReturn').css('background-color', '#f90000');
+                $('#btnReturn').css('color', '#ffffff');
+            } else {
+                $('#btnReturn').css('background-color', '#c0c0c0');
+                $('#btnReturn').css('color', '#000000');
+            }
+        });
+
+        // suspend order
+        $('#btnSuspend').click(function () {
+            if (testCustomer() == false) { return };
+            $('#suspendNote').focus();
+            $('#suspendNote').val('');
+            $('#form1').hide();
+            $('#suspend').show();
+        });
+        $('#exitSuspend').click(function () {
+            $('#suspend').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+        $('#suspendOK').click(function () {
+            // put in suspense
+
+            $('#suspend').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+        // retrieve suspended order
+        $('#btnRetrieve').click(function () {
+            if (data.length > 0) { return };
+            isRetrieveSuspended == true;
+            for (var i = 0; i < 14; i++) {
+                var dtVar = Math.round(Math.random() * 10);
+                var mDate = new Date();
+                mDate.setDate(mDate.getDate() - dtVar);
+                var sDate = shortDays[mDate.getDay()] + ', ' + shortMonths[mDate.getMonth()] + ' ' + mDate.getDate() + ', ' + mDate.getFullYear();
+                var d2 = (data2[i] = {});
+                d2['orderdate'] = sDate;
+                d2['ordernote'] = 'Saved as: ' + i;
+                d2['orderguid'] = UUID.generate().toUpperCase().replace(/-/g, '');
+                d2['custname'] = 'Fred Jones';
+                d2['customer_id'] = UUID.generate().toUpperCase().replace(/-/g, '');
+            }
+            grid2.invalidate();
+            grid2.render();
+
+            $('#form1').hide();
+            $('#getDataMessage').text('Suspended');
+            $('#scanReceiptDiv').hide();
+            $('#getData').show();
+        });
+        $('#exitGetData').click(function () {
+            data2.length = 0;
+            grid2.invalidate();
+            grid2.render();
+            $('#getData').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+        $('#getDataSelect').click(function () {
+            var dataRow = grid2.getSelectedRows();
+            //data[data.length - 1]['return_reason_code'] = dataReturnReasons[reasonRow[0]]['id'];
+
+            // fill in data
+            if (isRetrieveSuspended) {
+                // get suspened and fill in data & grid
+            } else {
+                // get receipt, fill in data & grid, disable edit, pay, allow returns then pay only returns
+            }
+
+            data2.length = 0;
+            grid2.invalidate();
+            grid2.render();
+            $('#getData').hide();
+            $('#form1').show();
+            grid.gotoCell(data.length, 0, false);
+        });
+        // retrieve receipts
+
+// ***** ADD SCAN OLD RECEIPT ***** //
+
+        $('#btnReceipts').click(function () {
+            if (data.length > 0) { return };
+            isRetrieveSuspended == false;
+
+            var dtVar = Math.round(Math.random() * 10);
+            var mDate = new Date();
+            mDate.setDate(mDate.getDate() - dtVar);
+            var sDate = shortDays[mDate.getDay()] + ', ' + shortMonths[mDate.getMonth()] + ' ' + mDate.getDate() + ', ' + mDate.getFullYear();
+            for (var i = 0; i < 31; i++) {
+                var d2 = (data2[i] = {});
+                d2['orderdate'] = sDate;
+                d2['ordernote'] = 'Saved as: ' + i;
+                d2['orderguid'] = UUID.generate().toUpperCase().replace(/-/g, '');
+                d2['custname'] = 'Fred Jones';
+                d2['customer_id'] = UUID.generate().toUpperCase().replace(/-/g, '');
+            }
+            grid2.invalidate();
+            grid2.render();
+            
+            $('#form1').hide();
+            $('#getDataMessage').text('Receipts');
+            $('#scanReceiptDiv').show();
+            $('#getData').show();
+        });
+        // date picker helpers
+        $(function () {
+            $(".date-pick").datePicker({
+                //autoFocusNextInput: true,
+                startDate: '01/01/2010',
+                endDate: (new Date()).asString()
+            });
+            
+            $('#fromDatepicker').bind('dpClosed',
+            function (e, selectedDates) {
+                var d = selectedDates[0];
+                if (d) {
+                    d = new Date(d);
+                    $('#toDatepicker').dpSetStartDate(d.asString());
+                    var d2 = new Date($('#toDatepicker').datePicker().val());
+                    if (d2 < d) {
+                        $('#toDatepicker').datePicker().val(d.asString()).trigger('change');
+                    }
+
+                }
+            });
+            $('#toDatepicker').bind('dpClosed',
+            function (e, selectedDates) {
+                var d = selectedDates[0];
+                if (d) {
+                    d = new Date(d);
+                    $('#fromDatepicker').dpSetEndDate(d.asString());
+                    var d2 = new Date($('#fromDatepicker').datePicker().val());
+                    if (d2 > d) {
+                        $('#fromDatepicker').datePicker().val(d.asString()).trigger('change');
+                    }
+                }
+            });
+        });
+        $(".date-pick").bind('click', function () {
+            $(this).trigger('change');
+            $(this).dpDisplay();
+        });
+
+        // Cancel entire order
+        $('#btnCancel').click(function () {
+            // save to db as canceled
+            clearOrder();
+        });
+
+        // Shipping
+        $('#shipping').dblclick(function () {
+            if (!isChangeApproved) {
+                isChangeApproved = createPopupDialog('SupervisorOverride.html', '');
+            }
+            if (isChangeApproved) {
+                if (isNoShipping) {
+                    isNoShipping = false;
+                } else {
+                    isNoShipping = true;
+                }
+                sumExtendedPrice();
+            }
+        });
+
+        // *** Customer ***
+
+        // Last name to upper case
+        $("#lastName").blur(function () {
+            $("#lastName").val($("#lastName").val().toUpperCase());
+        });
+
+        // First name to upper case
+        $("#firstName").blur(function () {
+            $("#firstName").val($("#firstName").val().toUpperCase());
+        });
+
+        // Address 1 to upper case
+        $("#address1").blur(function () {
+            if ($("#address1").val() == '') { return }
+            if (!addrs1Parsed) {
+                $("#address1").val(parseAddress($("#address1").val()));
+                addrs1Parsed = true;
+            } else {
+                $("#address1").val($("#address1").val().toUpperCase());
+            }
+        });
+
+        // Address 2 to upper case
+        $("#address2").blur(function () {
+            if ($("#address2").val() == '') { return }
+            if (!addrs2Parsed) {
+                $("#address2").val(parseAddress($("#address2").val()));
+                addrs2Parsed = true;
+            } else {
+                $("#address2").val($("#address2").val().toUpperCase());
+            }
+        });
+
+        // ZIP Code
+        $('#zipCode').blur(function () {
+            if ($('#zipCode').val() == '') return;
+            var city = $("#city");
+            var countryText = $("#country").val();
+            if (!countryText) {
+                countryText = "US"
+            }
+
+            if (!city.val()) {
+                request = "http://www.geonames.org/postalCodeLookupJSON?&country=" + countryText + "&callback=?"
+                $.getJSON(request, {
+                    postalcode: $("#zipCode").val()
+                },
+                function (response) {
+                    if (!city.val() && response && response.postalcodes.length && response.postalcodes[0].placeName) {
+                        city.val(response.postalcodes[0].placeName.toUpperCase());
+                        $("#state").val(response.postalcodes[0].adminCode1.toUpperCase());
+                        $("#country").val(response.postalcodes[0].countryCode.toUpperCase());
+                    }
+                })
+            }
+        });
+
+        // City to upper case
+        $("#city").blur(function () {
+            $("#city").val($("#city").val().toUpperCase());
+        });
+
+        // State to upper case
+        $("#state").blur(function () {
+            $("#state").val($("#state").val().toUpperCase().substring(0, 2));
+            // test against valid states
+        });
+
+        // Country to upper case
+        $("#country").blur(function () {
+            $("#country").val($("#country").val().toUpperCase().substring(0, 2));
+        });
+
+        // Email validation
+        $("#email").blur(function () {
+            if ($('#email').val() == '') return;
+            if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test($('#email').val())) {
+                showMsg('You have entered an invalid email address.');
+                $('#email').focus();
+            }
+        });
+
+        // *** Shipping ***
+
+        // Last name to upper case
+        $("#slastName").blur(function () {
+            $("#slastName").val($("#slastName").val().toUpperCase());
+        });
+
+        // First name to upper case
+        $("#sfirstName").blur(function () {
+            $("#sfirstName").val($("#sfirstName").val().toUpperCase());
+        });
+
+        // Address 1 to upper case
+        $("#saddress1").blur(function () {
+            if ($("#saddress1").val() == '') { return }
+            if (!saddrs1Parsed) {
+                $("#saddress1").val(parseAddress($("#saddress1").val()));
+                saddrs1Parsed = true;
+            } else {
+                $("#saddress1").val($("#saddress1").val().toUpperCase());
+            }
+        });
+
+        // Address 2 to upper case
+        $("#saddress2").blur(function () {
+            if ($("#saddress2").val() == '') { return }
+            if (!saddrs2Parsed) {
+                $("#saddress2").val(parseAddress($("#saddress2").val()));
+                saddrs2Parsed = true;
+            } else {
+                $("#saddress2").val($("#saddress2").val().toUpperCase());
+            }
+        });
+
+        // ZIP Code
+        $('#szipCode').blur(function () {
+            if ($('#szipCode').val() == '') return;
+            var city = $("#scity");
+            var countryText = $("#scountry").val();
+            if (!countryText) {
+                countryText = "US"
+            }
+
+            if (!city.val()) {
+                request = "http://www.geonames.org/postalCodeLookupJSON?&country=" + countryText + "&callback=?"
+                $.getJSON(request, {
+                    postalcode: $("#szipCode").val()
+                },
+                function (response) {
+                    if (!city.val() && response && response.postalcodes.length && response.postalcodes[0].placeName) {
+                        city.val(response.postalcodes[0].placeName.toUpperCase());
+                        $("#sstate").val(response.postalcodes[0].adminCode1.toUpperCase());
+                        $("#scountry").val(response.postalcodes[0].countryCode.toUpperCase());
+                    }
+                })
+            }
+        });
+
+        // City to upper case
+        $("#scity").blur(function () {
+            $("#scity").val($("#scity").val().toUpperCase());
+        });
+
+        // State to upper case
+        $("#sstate").blur(function () {
+            $("#sstate").val($("#sstate").val().toUpperCase().substring(0, 2));
+            // test against valid states
+        });
+
+        // Country to upper case
+        $("#scountry").blur(function () {
+            $("#scountry").val($("#scountry").val().toUpperCase().substring(0, 2));
+        });
+
+        // Email validation
+        $("#semail").blur(function () {
+            if ($('#semail').val() == '') return;
+            if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test($('#semail').val())) {
+                showMsg('You have entered an invalid email address.');
+                $('#semail').focus();
+            }
+        });
+
+        // Pay the Tender
+        $('#btnPay').click(function () {
+            if (testCustomer() == false) { return }
+
+            var oPaid = [];
+            oPaid.Amount = 0;
+            oPaid.Payment = [];
+            oPaid.Details = [];
+            oPaid.OK = false;
+            var params = [];
+            params.Amount = toFixed(total, 2);
+            params.phoneOrder = phoneOrderCookie;
+            while (oPaid.OK == false) {
+                oPaid = createPopupDialog('Pay.html', params);
+            }
+
+            if (oPaid.Amount != undefined && oPaid.Amount != 0) {
+                // tender finished
+                // update or add customer
+                if (changedCustomer()) {
+                    if (is_downloaded_customer) {
+                        // we have customer id
+
+                    } else {
+                        // create new customer id
+
+                    }
+                }
+                if (changedShipTo()) {
+                    if (is_downloaded_shipto) {
+
+                    } else {
+
+                    }
+                }
+
+                // send tender and changed customer info and confirm the order to server
+                
+                // create work orders
+                for (var i = 0; i < data.length; i++) {
+
+                    if (data[i]["ship"] == "checked" || data[i]["ship"] == true) {
+                        
+                    };
+                    if (data[i]["ship"] == "checked" || data[i]["ship"] == true) {
+
+                    }
+                    if (data[i]["altspecial"].AlterLength == true ||
+                        data[i]['altspecial'].AlterWaist == true ||
+                        data[i]['altspecial'].AlterBoth == true ||
+                        data[i]['altspecial'].Special == true ||
+                        data[i]['altspecial'].Personalization == true
+                        ) {
+
+
+                    }
+                };
+
+
+                // handle receipt
+                if ($('#email').val() != '') {
+                    var confirm = createPopupDialog('EmailOrPrint.html', '');
+                        if (confirm == 'Email') {
+                            emailReceipt(oPaid.Amount, oPaid.Payment);
+                        } else if (confirm == 'Print') {
+                            printReceipt(oPaid.Amount, oPaid.Payment);
+                        } else {
+                            emailReceipt(oPaid.Amount, oPaid.Payment);
+                            printReceipt(oPaid.Amount, oPaid.Payment);
+                        }
+                } else { printReceipt(oPaid.Amount, oPaid.Payment); }
+            }
+        });
+
+        function testCustomer() {
+            var ret = true;
+
+            if ($('#phone').val() == '') {
+                ret = false;
+                $('#phonelabel').css('color', 'red');
+            } else {
+                $('#phonelabel').css('color', 'black');
+            };
+            if ($('#lastName').val() == '') {
+                ret = false;
+                $('#lastnamelabel').css('color', 'red');
+            } else {
+                $('#lastnamelabel').css('color', 'black');
+            };
+            if ($('#firstName').val() == '') {
+                ret = false;
+                $('#firstnamelabel').css('color', 'red');
+            } else {
+                $('#firstnamelabel').css('color', 'black');
+            };
+            if ($('#address1').val() == '') {
+                ret = false;
+                $('#address1label').css('color', 'red');
+            } else {
+                $('#address1label').css('color', 'black');
+            };
+            if ($('#city').val() == '') {
+                ret = false;
+                $('#citylabel').css('color', 'red');
+            } else {
+                $('#citylabel').css('color', 'black');
+            };
+            if ($('#state').val() == '') {
+                ret = false;
+                $('#statelabel').css('color', 'red');
+            } else {
+                $('#statelabel').css('color', 'black');
+            };
+            if ($('#zipCode').val() == '') {
+                ret = false;
+                $('#zipcodelabel').css('color', 'red');
+            } else {
+                $('#zipcodelabel').css('color', 'black');
+            };
+            if ($('#country').val() != 'US' && $('#country').val() == '') {
+                ret = false;
+                $('#countrylabel').css('color', 'red');
+            } else {
+                $('#countrylabel').css('color', 'black');
+            };
+            if ($('#cschool').val() == '') {
+                ret = false;
+                $('#cschoollabel').css('color', 'red');
+            } else {
+                $('#cschoollabel').css('color', 'black');
+            };
+
+            var ship = false;
+            if ($('#sphone').val() != '') { ship = true };
+            if ($('#saltphone').val() != '') { ship = true };
+            if ($('#slastName').val() != '') { ship = true };
+            if ($('#sfirstName').val() != '') { ship = true };
+            if ($('#saddress1').val() != '') { ship = true };
+            if ($('#saddress2').val() != '') { ship = true };
+            if ($('#scity').val() != '') { ship = true };
+            if ($('#sstate').val() != '') { ship = true };
+            if ($('#szipCode').val() != '') { ship = true };
+            if ($('#scountry').val() != 'US' && $('#scountry').val() != '') { ship = true };
+            if ($('#semail').val() != '') { ship = true };
+            
+            if (ship == true) {
+                if ($('#sphone').val() == '') {
+                    ret = false;
+                    $('#sphonelabel').css('color', 'red');
+                } else {
+                    $('#sphonelabel').css('color', 'black');
+                };
+                if ($('#slastName').val() == '') {
+                    ret = false;
+                    $('#slastnamelabel').css('color', 'red');
+                } else {
+                    $('#slastnamelabel').css('color', 'black');
+                };
+                if ($('#sfirstName').val() == '') {
+                    ret = false;
+                    $('#sfirstnamelabel').css('color', 'red');
+                } else {
+                    $('#sfirstnamelabel').css('color', 'black');
+                };
+                if ($('#saddress1').val() == '') {
+                    ret = false;
+                    $('#saddress1label').css('color', 'red');
+                } else {
+                    $('#saddress1label').css('color', 'black');
+                };
+                if ($('#scity').val() == '') {
+                    ret = false;
+                    $('#scitylabel').css('color', 'red');
+                } else {
+                    $('#scitylabel').css('color', 'black');
+                };
+                if ($('#sstate').val() == '') {
+                    ret = false;
+                    $('#sstatelabel').css('color', 'red');
+                } else {
+                    $('#sstatelabel').css('color', 'black');
+                };
+                if ($('#szipCode').val() == '') {
+                    ret = false;
+                    $('#szipcodelabel').css('color', 'red');
+                } else {
+                    $('#szipcodelabel').css('color', 'black');
+                };
+                if ($('#scountry').val() != 'US' && $('#scountry').val() == '') {
+                    ret = false;
+                    $('#scountrylabel').css('color', 'red');
+                } else {
+                    $('#scountrylabel').css('color', 'black');
+                };
+            }
+            if (ret == false) {
+                showMsg('Please correct the customer information.');
+                isPhoneNumberError = true;
+            }
+            return ret;
+        };
+        function changedCustomer() {
+            var ret = true;
+            if ($('#phone').val() != c_phone) { ret = false };
+            if ($('#altphone').val() != c_altphone) { ret = false };
+            if ($('#lastName').val() != c_lastName) { ret = false };
+            if ($('#firstName').val() != c_firstName) { ret = false };
+            if ($('#address1').val() != c_address1) { ret = false };
+            if ($('#address2').val() != c_address2) { ret = false };
+            if ($('#city').val() != c_city) { ret = false };
+            if ($('#state').val() != c_state) { ret = false };
+            if ($('#zipCode').val() != c_zipCode) { ret = false };
+            if ($('#country').val() != c_country) { ret = false };
+            if ($('#email').val() != c_email) { ret = false };
+            if ($('#cschool').val() != c_cschool) { ret = false };
+            return ret;
+        };
+        function changedShipTo() {
+            var ret = true;
+            if ($('#sphone').val() != c_sphone) { ret = false };
+            if ($('#saltphone').val() != c_saltphone) { ret = false };
+            if ($('#slastName').val() != c_slastName) { ret = false };
+            if ($('#sfirstName').val() != c_sfirstName) { ret = false };
+            if ($('#saddress1').val() != c_saddress1) { ret = false };
+            if ($('#saddress2').val() != c_saddress2) { ret = false };
+            if ($('#scity').val() != c_scity) { ret = false };
+            if ($('#sstate').val() != c_sstate) { ret = false };
+            if ($('#szipCode').val() != c_szipCode) { ret = false };
+            if ($('#scountry').val() != c_scountry) { ret = false };
+            if ($('#semail').val() != c_semail) { ret = false };
+            return ret;
+        };
+
+        function printReceipt(amt, payment) {
+            var msg = amt + " ";
+            if (payment != undefined) {
+                for (var i = 0; i < payment.length; i++) {
+                    msg += payment[i];
+                    if (i < payment.length - 1) { msg += "; " }
+                }
+            }
+            createPopupDialog('ConfirmationBox.html', 'Print Receipt $' + msg);
+            history.go(-1);
+        };
+
+        function emailReceipt(amt, payment) {
+            var msg = amt + " ";
+            if (payment != undefined) {
+                for (var i = 0; i < payment.length; i++) {
+                    msg += payment[i];
+                    if (i < payment.length - 1) { msg += "; " }
+                }
+            }
+            createPopupDialog('ConfirmationBox.html', 'Email Receipt for $' + msg + ' to ' + $('#email').val());
+            history.go(-1);
+        };
+</script>
+</body>
+</html>

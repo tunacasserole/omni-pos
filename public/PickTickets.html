@@ -1,0 +1,384 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+
+        <!-- Styles Used/Referenced -->
+    <link rel="stylesheet" href="Styles/Slick.Grid.css" type="text/css" />
+    <link rel="stylesheet" href="Styles/jquery-ui-1.8.23.custom.css" type="text/css" />
+    <link rel="stylesheet" href="Styles/examples.css" type="text/css" />
+    <link rel="stylesheet" href="Styles/datePicker.css" type="text/css" />
+    <link rel="stylesheet" href="Styles/POS.css" type="text/css" />
+
+    <!-- Javascript Imports -->
+    <script type="text/javascript" src="Scripts/jquery-1.8.1.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui-1.8.23.custom.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery.event.drag-2.0.min.js"></script>
+    <script type="text/javascript" src="Scripts/Slick.Core.js"></script>
+    <script type="text/javascript" src="Scripts/Slick.Grid.js"></script>
+    <script type="text/javascript" src="Scripts/Slick.RowSelectionModel.js"></script>
+    <script type="text/javascript" src="Scripts/date.js"></script>
+    <script type="text/javascript" src="Scripts/UUID.core.js"></script>
+    <script type="text/javascript" src="Scripts/datePicker.js"></script>
+    <script type="text/javascript" src="Scripts/POS.custom.js"></script>
+    <style type="text/css">
+         body {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 1024px;
+            height: 768px;
+            background-color: rgba(247, 248, 167, 1.0);
+            margin: 0 0 0 0;
+            border: none !important;
+            z-index: 2000;
+        }
+         #msgBox {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            border: none;
+            width: 1020px;
+            height: 764px;
+            /*background: white transparent scroll repeat 0% 0%;*/
+            background: white;
+            opacity: 0.4;
+            filter:alpha(opacity=40);
+            pointer-events:visible;
+            z-index: 9997;
+        }
+        #_msgBox {
+            position: absolute;
+            top: 270px;
+            left: 310px;
+            width: 400px;
+            height: 200px;
+            background-color: rgba(255, 168, 64, 1.0) !important;
+            color: white !important;
+            border: 3px solid white !important;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            z-index: 9998;
+        }
+        #new_picks, #to_pick {
+            position: absolute;
+            top: 50px;
+            left: 10px;
+            width: 980px;
+            height: 600px;
+            background-color: lightblue;
+        }
+        #newGrid {
+            position: absolute;
+            top: 54px;
+            left: 30px;
+            width: 940px;
+            height: 474px;
+            border:none;
+        }
+        #topickGrid {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            width: 940px;
+            height: 508px;
+            border: none;
+          }
+    </style>
+    <script type="text/javascript">
+        function init() {
+            self.moveTo(0, 0);
+            self.resizeTo(1024, 768);
+
+            $('#tabs').tabs({ active: 0 });
+
+            newPicksGrid = new Slick.Grid("#newGrid", newPicksData, columnsPicks, options);
+            newPicksGrid.setSelectionModel(new Slick.RowSelectionModel());
+            toPickGrid = new Slick.Grid("#topickGrid", toPickData, columnsPicks, options);
+            toPickGrid.setSelectionModel(new Slick.RowSelectionModel());
+
+            newPicksData= [];
+            newPicksGrid.invalidate();
+            newPicksGrid.render();
+
+            toPickData = [];
+            toPickGrid.invalidate();
+            toPickGrid.render();
+
+            $('body').bind("contextmenu", function (e) {
+                e.preventDefault();
+            });
+
+            Date.format = 'mm/dd/yyyy';
+            $('.date-pick').datePicker().val(new Date().asString()).trigger('change');
+        }
+    </script>
+</head>
+<body onload="init()">
+    <form id="form1" action="javascript:void(0);">
+    <div style="margin: 0; padding: 0; border:none;">
+        <img id='exitPicks' onclick="javascript: history.go(-1)" src="Images/round-exit.png" alt="Exit" style="position:absolute; left:990px; top:0px; height:2.5em; width:2.5em; padding-right:0.5em; padding-top:0.5em; z-index:8000;" />
+    </div>
+    <div id="tabs">
+        <ul>
+            <li><a href="#new_picks" style="font-size:1.2em; font-weight: bold;">New Pick Tickets</a></li>
+            <li><a href="#to_pick" style="font-size:1.2em; font-weight: bold;">Items to Pick</a></li>
+        </ul>
+
+        <div id="new_picks">
+            <div style ="border:none;">
+                <div style="position:absolute; left:42px; top:20px; border:none;">
+                    <label style="color:black; padding-top:.3em">From Date:&nbsp;&nbsp;</label> <input type="text" id="fromDatepicker" class="date-pick"  />
+                </div>
+                <div style="position:absolute; left:298px; top:20px;  border:none;">
+                    <label style="color:black; padding-top:.3em">To Date:&nbsp;&nbsp;</label> <input type="text" id="toDatepicker" class="date-pick"  />
+                </div>
+                <div style="position:absolute; left:540px; top:20px;  border:none;">
+                    <label for="terminalsComboBox" style="color:black; padding-top:.3em">Location:&nbsp;&nbsp;</label>
+                    <select name="terminals" id="terminalsComboBox" style='text-align:left; margin-top:.1em; width:280px;'>
+                        <option value="none">None</option>
+                    </select>
+                </div>
+                <div style="position:absolute; left:890px; top:14px;  border:none;">
+                    <button type="button" class="fbuttons" id="btnSearch" style="height: 30px; background-color:white;">Search</button>
+                </div>
+            </div>
+            <div id="newGrid" style="border-left:none;"></div>
+            <div style="position:absolute; left:40px; top:550px; border:none;">
+                <button type="button" class="fbuttons" id="getDataSelect">Select</button>
+            </div>
+        </div>
+        <div id="to_pick"">
+            <div id="topickGrid" style="border-left:none;"></div>
+            <div style="border:none;">
+                <button type="button" class="fbuttons" id="print" style="position: absolute; left:40px; top:550px;">Print Pick List</button>
+                <button type="button" class="fbuttons" id="picked" style="position: absolute; left:860px; top:550px;" >Picked</button>
+            </div>
+        </div>
+    </div>
+    <div style="border:none; margin-top:3em;">
+        <button type="button" class="fbuttons" id="exitPickTickets" onclick="javascript: history.go(-1)" style="position:absolute; top:680px; left:10px; background-color:tomato; color:white;" >Exit</button>
+    </div>
+    </form>
+
+    <!-- Message Box (replaces alert) -->
+    <div id="msgBox" style="display:none;"></div>
+    <div id="_msgBox" style="display:none;">
+        <div style="text-align:center; margin-top:1em; border:none !important;">
+            <span id="msgText" style="font-size:1.5em; font-weight:bold;">Message!</span>
+        </div>
+        <div id="btnCenter" style="text-align:center; border:none !important;">
+            <button type="button" id="btnMsgOK" style="position: absolute; top: 150px; left: 170px; width: 60px; font-size:1.5em;">OK</button>
+        </div>
+    </div>
+
+    <!-- Constants, Variables -->
+    <script type="text/javascript">
+        var shortDays = [];
+        shortDays[0] = 'Sun';
+        shortDays[1] = 'Mon';
+        shortDays[2] = 'Tue';
+        shortDays[3] = 'Wed';
+        shortDays[4] = 'Thu';
+        shortDays[5] = 'Fri';
+        shortDays[6] = 'Sat';
+
+        var shortMonths = [];
+        shortMonths[0] = 'Jan';
+        shortMonths[1] = 'Feb';
+        shortMonths[2] = 'Mar';
+        shortMonths[3] = 'Apr';
+        shortMonths[4] = 'May';
+        shortMonths[5] = 'Jun';
+        shortMonths[6] = 'Jul';
+        shortMonths[7] = 'Aug';
+        shortMonths[8] = 'Sep';
+        shortMonths[9] = 'Oct';
+        shortMonths[10] = 'Nov';
+        shortMonths[11] = 'Dec';
+
+        // examine keyboard keys when not in an editor
+        var blockedKeysArr = [
+            // allow tab (7), caps lock (20), page up (33), page down (34), end (35)
+            8,  // backspace - will go back a url
+            //13, // enter
+            18, // alt
+            19, // pause, break
+            27, // escape
+            36, // home
+            45, // insert
+            // function keys 1 (112) - 12 (123)
+            112, 113, 114, 115,
+            116, // F5
+            117, 118, 119, 120, 121,
+            122, // F11
+            123
+        ];
+
+        var newPicksGrid;
+        var newPicksData = [];
+
+        var toPickGrid;
+        var toPickData = [];
+
+        var columnsPicks = [
+        { id: "picksDate", name: "Date", field: "picksDate", width: 119, resizable: false },
+        { id: "picksStore", name: "Store", field: "picksStore", width: 120, resizable: false },
+        { id: "picksSupplier", name: "Brand", field: "picksSupplier", width: 50, resizable: false },
+        { id: "picksStyle", name: "Style", field: "picksStyle", width: 100, resizable: false },
+        { id: "picksColor", name: "Color", field: "picksColor", width: 70, resizable: false },
+        { id: "picksSize", name: "Size", field: "picksSize", width: 100, resizable: false },
+        { id: "picksVariance", name: "Other", field: "picksVariance", width: 50, resizable: false },
+        { id: "picksDescription", name: "Description", field: "picksDescription", width: 230, resizable: false },
+        { id: "picksQuantity", name: "Qty", field: "picksQuantity", width: 40, resizable: false }
+        ];
+
+        var options = {
+            editable: false,
+            autoEdit: false,
+
+            enableAddRow: false,
+            enableCellNavigation: true,
+            multiSelect: false,
+            enableColumnReorder: false,
+            asyncEditorLoading: false
+        }
+    </script>
+    <!-- Initialization -->
+    <script type="text/javascript">
+ 
+    </script>
+    <!-- Page-specific Utilities -->
+    <script type="text/javascript">
+        // Keyboard
+        $('body').keydown(function (e) {
+            if (e.ctrlKey || e.altKey) { return false; };
+            if (e.target.type != "text") { return false; };
+
+            //adjust for keypad
+            if (e.which >= 96 && e.which <= 105) {
+                e.which -= 48;
+            }
+            //ignore TAB
+            if (e.which == 9 || e.which == 16) {
+                return true;
+            }
+
+            //adjust for CR or arrow down or page down
+            if (e.which == 13 || e.which == 40 || e.which == 34) {
+                var x = document.getElementsByTagName("input");
+                for (var i = 0; i < x.length; i++) {
+                    if (e.target.id == x[i].id && i < x.length - 1) {
+                        if (/^\d*$/.test(x[i + 1].id) == true || x[i + 1].className == 'noncash') {
+                            if (x[i + 1].type == "text") {
+                                $('#' + x[i + 1].id).focus();
+                                break;
+                            }
+                        }
+                    }
+                    if (e.target.id == x[i].id && /^\d*$/.test(x[i + 1].id) == false) {
+                        $('#0').focus();
+                        break;
+                    }
+                }
+                return false;
+            }
+
+            //adjust for arrow up or page up
+            if (e.which == 33 || e.which == 38) {
+                var x = document.getElementsByTagName("input");
+                for (var i = 0; i < x.length; i++) {
+                    if (e.target.id == x[i].id && i < x.length) {
+                        if (i >= 1 && x[i - 1].type == "text") {
+                            $('#' + x[i - 1].id).focus();
+                            break;
+                        } else { break; }
+                    }
+                }
+                return false;
+            }
+
+            //test for delete key
+            if (e.which == 46) {
+                // pass the delete through
+                return true;
+            }
+            else if (e.target.type == 'text' && (e.which == 8 || e.which == 35 || e.which == 36 || e.which == 37 || e.which == 39)) {
+                // pass backspace, end, home, left and right arrows to form if text type input
+                return true;
+            }
+            else if (e.target.type == 'text' && e.which == 27) {
+                // clear entry if text type input
+                e.target.value = '';
+                return false;
+            }
+            else {
+                // review other codes to see if they should be blocked
+                for (var t = 0; t < blockedKeysArr.length; t++) {
+                    if (e.which == blockedKeysArr[t]) {
+                        //alert("Key Code: " + window.event.keyCode + " This action is not allowed");
+                        if (e.which != 16 && e.which != 17) {
+                            window.event.keyCode = 503;
+                        }; //shift, control
+                        if (e.stopPropagation) e.stopPropagation();
+                        if (e.preventDefault) e.preventDefault();
+                        return false;
+                    }
+                }
+                if (/^\d*$/.test(e.target.id) == true) {
+                    if (e.which < 48 || e.which > 57) { return false };
+                }
+                return true;
+            }
+        });
+
+        // show and hide the message box
+        function showMsg(msg) {
+            $('#msgText').text(msg);
+            $('#msgBox').show();
+            $('#_msgBox').show();
+        };
+        $('#btnMsgOK').click(function () {
+            $('#_msgBox').hide();
+            $('#msgBox').hide();
+        });
+
+        $(function () {
+            $(".date-pick").datePicker({
+                startDate: '01/01/2010',
+                endDate: (new Date()).asString()
+            });
+
+            $('#fromDatepicker').bind('dpClosed',
+            function (e, selectedDates) {
+                var d = selectedDates[0];
+                if (d) {
+                    d = new Date(d);
+                    $('#toDatepicker').dpSetStartDate(d.asString());
+                    var d2 = new Date($('#toDatepicker').datePicker().val());
+                    if (d2 < d) {
+                        $('#toDatepicker').datePicker().val(d.asString()).trigger('change');
+                    }
+                }
+            });
+            $('#toDatepicker').bind('dpClosed',
+            function (e, selectedDates) {
+                var d = selectedDates[0];
+                if (d) {
+                    d = new Date(d);
+                    $('#fromDatepicker').dpSetEndDate(d.asString());
+                    var d2 = new Date($('#fromDatepicker').datePicker().val());
+                    if (d2 > d) {
+                        $('#fromDatepicker').datePicker().val(d.asString()).trigger('change');
+                    }
+                }
+            });
+        });
+        $(".date-pick").bind('click', function () {
+            $(this).trigger('change');
+            $(this).dpDisplay();
+        });
+
+    </script>
+</body>
+</html>
