@@ -53,7 +53,7 @@
 
     function CheckmarkFormatter(row, cell, value, columnDef, dataContext) {
         if (value == true || value == 'checked') {
-            return "<img src='images/tick.png'>";
+            return "<img src='/Images/tick.png'>";
         } else {
             return "";
         }
